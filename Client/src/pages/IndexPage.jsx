@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
-// import Header from "../Header";
-import { UserContext } from "../../UserContext";
+import Header from "../Header";
+import { UserContext } from "../UserContext";
 
 export default function IndexPage() {
     const { setUser, user } = useContext(UserContext);
@@ -9,8 +9,8 @@ export default function IndexPage() {
     }
 
     return (
-        <div>
+        <>
             Index Page
-        </div>
+        </>
     )
 }
