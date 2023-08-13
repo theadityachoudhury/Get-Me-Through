@@ -5,20 +5,28 @@ const cookieParser = require("cookie-parser");
 const { success, error } = require("consola");
 const { DB, REQUEST_TIMEOUT, PORT } = require("./config/db");
 
+//Routes Imports
+const auth = require("./Routes/Auth/auth-routes");
+
 
 const app = express();
 
+
+//CORS Definition
 app.use(
 	cors({
 		credentials: true,
-		origin: ['https://fuzzy-spork.unknownclub.me','http://localhost:5173'],
+		origin: ['https://f.adityachoudhury.com','http://localhost:5173'],
 	})
 );
 
+//For getting req.body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+
+//Api Endpoints
 app.get("/", async (req, res) => {
 	res.send({
 		data: {
@@ -45,6 +53,9 @@ app.get("/api/health", (req, res) => {
 	});
 });
 
+//Authentication Endpoints
+app.use("/api/auth",auth);
+
 
 app.use((req, res) => {
 	res.status(404).json({
@@ -56,6 +67,8 @@ app.use((req, res) => {
 });
 
 
+
+//Database configuration and connection
 const startApp = async () => {
 	try {
 		// Connection With DB
