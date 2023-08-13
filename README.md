@@ -6,6 +6,10 @@
 
 Our project aims to revolutionize student event participation tracking at universities by introducing an automated facial recognition system. This system enables students to conveniently mark their presence by showing their faces, streamlining attendance management and boosting overall event participation.
 
+## Accessing The Deployed Project
+ - You can access the deployed Frontend at :- <a href="https://f.adityachoudhury.com">f.adityachoudhury.com</a>
+ - You can access the deployed Backend at :- <a href="https://fuzzy-spork.unknownclub.me">fuzzy-spork.unknownclub.me</a>
+
 ## Key Features 🚀
 
 - Automated facial recognition for event attendance
