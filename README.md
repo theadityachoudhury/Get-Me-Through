@@ -32,8 +32,8 @@ To run this project locally, follow these steps:
 1. Clone this repository: `git clone [repository_url]`
 2. Install dependencies for front-end and back-end: `npm install`
 3. Set up MongoDB and configure database connection
-4. Run the back-end server: `npm run start`
-5. Run the front-end: `npm run start`
+4. Run the back-end server: `npm run dev`
+5. Run the front-end: `npm run dev`
 6. Access the application in your web browser
 
 ## Contributors 👥
