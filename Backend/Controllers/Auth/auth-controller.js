@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET, JWT_REFRESH_TOKEN_SECRET } = require("../../config/db");
 const { signupSchema } = require("../../Validators/Auth/auth-val");
 const User = require("../../Models/Auth/users");
+const RefreshToken = require("../../Models/Auth/refreshTokens");
 
 //Response Messages
 const Login_MSG = {
@@ -133,7 +134,103 @@ const register = async (req, res, next) => {
 			errorMsg = err.message;
 		}
 		console.log(err);
-		return res.status(err.status||500).json({
+		return res.status(err.status || 500).json({
+			message: errorMsg,
+			success: false,
+		});
+	}
+};
+
+const login = async (req, res, next) => {
+	try {
+		const loginRequest = await loginSchema.validateAsync(req.body);
+		const user = User.findOne({ email: loginRequest.email });
+		if (!user) {
+			return res.status(404).json({
+				success: false,
+				message: Login_MSG.usernameNotExist,
+			});
+		}
+		if (user.deleted) {
+			return res.status(404).json({
+				reason: "username",
+				message: Login_MSG.usernameNotExist,
+				success: false,
+			});
+		}
+		let isMatch = await bcrypt.compare(password, user.password);
+		if (isMatch) {
+			const refreshTokenColl = await refreshToken.findOne({
+				email: loginRequest.email,
+			});
+			let token = jwt.sign(
+				{
+					user_id: user._id,
+					verified: user.verified,
+					email: user.email,
+					deleted: user.deleted,
+				},
+				JWT_SECRET,
+				{ expiresIn: "3m" }
+			);
+
+			let refreshToken = jwt.sign(
+				{
+					user_id: user._id,
+					verified: user.verified,
+					email: user.email,
+					deleted: user.deleted,
+				},
+				JWT_REFRESH_TOKEN_SECRET
+			);
+
+			if (!refreshTokenColl) {
+				const newRefreshTokenColl = new RefreshToken({
+					email: loginRequest.email,
+					refreshToken,
+				});
+			} else {
+				RefreshToken.updateOne(
+					{ email: loginRequest.email },
+					{ $push: { refreshToken: refreshToken } }
+				)
+					.then((result) => {})
+					.catch((err) => {
+						console.error(err);
+						return res.status(406).json({
+							reason: "username",
+							message: "Unable to generate refresh token",
+							success: false,
+						});
+					});
+			}
+
+			res.cookie("token", token);
+			res.cookie("refreshToken", refreshToken);
+
+			let result = {
+				token: token,
+				refreshToken: refreshToken,
+			};
+
+			return res
+				.status(200)
+				.json({ ...result, message: Login_MSG.loginSuccess, success: true });
+		} else {
+			return res.status(401).json({
+				reason: "password",
+				message: Login_MSG.wrongPassword,
+				success: false,
+			});
+		}
+	} catch (err) {
+		let errorMsg = Login_MSG.loginError;
+		if (err.isJoi === true) {
+			err.status = 403;
+			errorMsg = err.message;
+		}
+		console.log(err);
+		return res.status(err.status || 500).json({
 			message: errorMsg,
 			success: false,
 		});
