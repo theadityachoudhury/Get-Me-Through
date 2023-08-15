@@ -16,7 +16,7 @@ const app = express();
 app.use(
 	cors({
 		credentials: true,
-		origin: ['https://f.adityachoudhury.com','http://localhost:5173','https://registration-form-mlsa-kiit-1zk4inwdf-adityasubham03.vercel.app/',"https://registration-form-mlsa-kiit-nu.vercel.app/","https://registration-form-mlsa-kiit-agfeeqtr1-adityasubham03.vercel.app/","https://registration-form-mlsa-kiit-git-main-adityasubham03.vercel.app/"],
+		origin: ['https://f.adityachoudhury.com','https://mlsa.unknownclub.me','http://localhost:5173','https://registration-form-mlsa-kiit-1zk4inwdf-adityasubham03.vercel.app/','https://registration-form-mlsa-kiit-nu.vercel.app/','https://registration-form-mlsa-kiit-agfeeqtr1-adityasubham03.vercel.app/','https://registration-form-mlsa-kiit-git-main-adityasubham03.vercel.app/'],
 	})
 );
 
