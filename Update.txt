@@ -3,4 +3,13 @@ Cloning tensorflow repository. -- TensorFlow model Garden.
 
 Tensorflow MG or Tensorflow.jsf
 
-Alternative ?? YOLO NAS --- 
+Alternative ?? YOLO NAS --- good for object detection but good for face detection??
+
+
+VIOLA JONES ALGORITHEM -- best face detection algorithem right now!!
+
+1			The Viola-Jones algorithm, pioneered by Paul Viola and Michael Jones in 2001, revolutionized the field of face detection. Its efficient and robust methodology opened doors to a wide range 
+of applications that rely on accurately identifying and analyzing human faces. By harnessing the power of Haar-like features, integral images, machine learning, and cascades of classifiers, the Viola-Jones
+algorithm showcases the synergy between computer science and image processing.
+
+2			
