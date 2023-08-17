@@ -12,4 +12,5 @@ VIOLA JONES ALGORITHEM -- best face detection algorithem right now!!
 of applications that rely on accurately identifying and analyzing human faces. By harnessing the power of Haar-like features, integral images, machine learning, and cascades of classifiers, the Viola-Jones
 algorithm showcases the synergy between computer science and image processing.
 
-2			
+2			pip install moviepy
+			pip install ffmpeg
