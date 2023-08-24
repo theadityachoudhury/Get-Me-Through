@@ -14,3 +14,9 @@ algorithm showcases the synergy between computer science and image processing.
 
 2			pip install moviepy
 			pip install ffmpeg
+
+
+#24-8-2023
+
+
+Train with video caputred before!!!!
