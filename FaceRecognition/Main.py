@@ -1,19 +1,12 @@
 import os
 import cv2
 
-# import time
 
 
 cap = cv2.VideoCapture(0)
 cap.set(3, 1280)
 cap.set(4, 720)
 
-                                                    # Set the timeout period in seconds
-                                                    # timeout_seconds = 10
-
-                                                    # Get the starting time
-                                                    # start_time = time.time()
-                                                    # and time.time() - start_time < timeout_seconds:
 
 imgBackground = cv2.imread('Resources/background.png')
 folderModePath = 'Resources/Modes'
