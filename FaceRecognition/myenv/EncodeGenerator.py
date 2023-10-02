@@ -1,5 +1,4 @@
 import os
-
 import cv2
 import face_recognition
 import pickle
@@ -29,5 +28,13 @@ def findEncoding(imagesList):
 
 print("Encoding Started . . .")
 encodeListKnown = findEncoding(imgList)
-print(encodeListKnown)
+encodeListKnownwithIds = [encodeListKnown, studentIds]
 print("Encoding has completed!")
+
+
+#pickling the encodedList -- making it to bytestream
+
+file = open("EncodeGenerator.p",'wb')
+pickle.dump(encodeListKnownwithIds,file)
+file.close()
+print("File pickled and saved")
