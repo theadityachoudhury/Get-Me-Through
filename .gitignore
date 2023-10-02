@@ -132,4 +132,7 @@ dist
 #.ipynb_checkpoints
 .ipynb_checkpoints
 
+#Tensorflow Folder
+Tensorflow
+
 
