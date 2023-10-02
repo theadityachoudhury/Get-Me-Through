@@ -132,6 +132,9 @@ dist
 #.ipynb_checkpoints
 .ipynb_checkpoints
 
+#tensorintialization file
+Main.ipynb
+
 #Tensorflow Folder
 Tensorflow
 
