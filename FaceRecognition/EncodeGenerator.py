@@ -34,7 +34,7 @@ print("Encoding has completed!")
 
 #pickling the encodedList -- making it to bytestream
 
-file = open("EncodeGenerator.p",'wb')
+file = open("EncodeGenerator.p", 'wb')
 pickle.dump(encodeListKnownwithIds,file)
 file.close()
 print("File pickled and saved")
