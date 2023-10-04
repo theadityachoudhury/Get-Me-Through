@@ -32,7 +32,7 @@ while True:
 
 
     img_resized = cv2.resize(img,(765, 396), None, 0.25,0.25 ) # resize() function is used to resize the camera output to specifed length
-    img_resized = cv2.cvtColor(img_resized,cv2.COLOR_BGR2RGB)
+    # img_resized = cv2.cvtColor(img_resized,cv2.COLOR_BGR2RGB)
     # img_resized1 = cv2.resize(imgModeList[0], (445, 415))  # and breadth!!
 
     faceCurFrame = face_recognition.face_locations(img_resized)
@@ -47,7 +47,11 @@ while True:
     imgBackground[354:354 + 396, 94:94 + 765] = img_resized  # here the position is mentioned!
     imgBackground[354:354 + 395, 958:958 + 398] = imgModeList[1]
 
-
+    for encodeFace , faceLoc in zip(encodeCurFrame,faceCurFrame):
+        matches= face_recognition.compare_faces(encodeListKnown,encodeFace)
+        faceDis = face_recognition.face_distance(encodeListKnown,encodeFace)
+        print("matches", matches)
+        print("FaceDis",faceDis)
 
 
     cv2.imshow("face attendance", imgBackground)  # to output the camera!!
