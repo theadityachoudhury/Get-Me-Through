@@ -20,7 +20,7 @@ print(studentIds)
 def findEncoding(imagesList):
     encodeList = []
     for img in imagesList:
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         encode = face_recognition.face_encodings(img)[0]
         encodeList.append(encode)
     return encodeList
