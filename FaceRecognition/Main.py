@@ -15,6 +15,7 @@ firebase_admin.initialize_app(cred,{
     'storageBucket' : "faceattendancerealtime-a8bc3.appspot.com"
 })
 
+# bucket = storage.bucket()   #bucket that will store the images that has been uploaded in the database
 
 cap = cv2.VideoCapture(0)
 cap.set(3, 1280)
@@ -42,6 +43,7 @@ print("Encoded file loaded")  #printing the status of load
 modeType = 1
 counter = 0
 id = -1
+# imgStudent = []
 
 while True:
     success, img = cap.read()  # cap.read() reads the files, if it is an image, then it will read the vectors
@@ -90,15 +92,31 @@ while True:
 
     if counter!=0:
         if counter == 1:
+
+            # get the data
             studentInfo = db.reference(f'Students/{id}').get()
             print(studentInfo)
+            #get the image
+            # blob = bucket.get_blob(f'Images/{id}').get()
+            # array = np.frombuffer(blob.download_as_string(), np.uint8)  #creating an array to store the download image
+            # imgStudent = cv2.imdecode(array, cv2.COLOR_BGRA2RGB)
+            #not implementing "showing image" here!!
+
+
+            #update data of attendance in firebase
+
+
 
         cv2.putText(imgBackground,str(studentInfo['name']),(1112,604),
                     cv2.FONT_HERSHEY_DUPLEX,1,(0,0,0),2)
-        cv2.putText(imgBackground, str(studentInfo), (1112, 640),
+        cv2.putText(imgBackground, str(studentIds[matchIndex]), (1112, 640),
                     cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
-        cv2.putText(imgBackground, str(studentIds['section']), (1112, 675),
+        cv2.putText(imgBackground, str(studentInfo['section']), (1112, 675),
                     cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+        cv2.putText(imgBackground, str(studentInfo['branch']), (1112, 715),
+                    cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+
+
         counter +=1
 
     cv2.imshow("face attendance", imgBackground)  # to output the camera!!
