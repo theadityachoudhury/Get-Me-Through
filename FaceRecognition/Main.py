@@ -60,7 +60,7 @@ while True:
 
         if matches[matchIndex]:
             # print("Known face detected!", )
-            # print(studentIds[matchIndex])
+            print(studentIds[matchIndex])
             #try going out of the loop
 
             y1,x2,y2,x1 = faceLoc
