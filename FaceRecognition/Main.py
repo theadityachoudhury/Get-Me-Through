@@ -4,6 +4,17 @@ import numpy as np
 import cv2
 import face_recognition
 import cvzone
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+from firebase_admin import storage
+
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred,{
+    'databaseURL' : " https://faceattendancerealtime-a8bc3-default-rtdb.firebaseio.com/",
+    'storageBucket' : "faceattendancerealtime-a8bc3.appspot.com"
+})
+
 
 cap = cv2.VideoCapture(0)
 cap.set(3, 1280)
@@ -28,6 +39,10 @@ encodeListKnown, studentIds = encodeListKnownwithIds
 print("Encoded file loaded")  #printing the status of load
 
 
+modeType = 1
+counter = 0
+id = -1
+
 while True:
     success, img = cap.read()  # cap.read() reads the files, if it is an image, then it will read the vectors
 
@@ -47,7 +62,7 @@ while True:
 
 
     imgBackground[354:354 + 396, 94:94 + 765] = img_resized  # here the position is mentioned!
-    imgBackground[354:354 + 395, 958:958 + 398] = imgModeList[1]
+    imgBackground[354:354 + 395, 958:958 + 398] = imgModeList[modeType]
 
     for encodeFace , faceLoc in zip(encodeCurFrame,faceCurFrame):
         matches = face_recognition.compare_faces(encodeListKnown,encodeFace)
@@ -56,22 +71,38 @@ while True:
         # print("FaceDis",faceDis)
 
         matchIndex = np.argmin(faceDis)
-        print("Match Index : ", matchIndex)
+        # print("Match Index : ", matchIndex)
 
         if matches[matchIndex]:
             # print("Known face detected!", )
-            print(studentIds[matchIndex])
+            # print(studentIds[matchIndex])
             #try going out of the loop
 
             y1,x2,y2,x1 = faceLoc
-            print(x1,x2,y1,y2)
+            # print(x1,x2,y1,y2)
             # y1, x2, y2, x1 = y1*4,x2*4,y2*4,x1*4
             bbox =  94 + x1,  354 + y1 , x2 - x1, y2 - y1
-            cvzone.cornerRect(imgBackground,bbox,rt=0)
+            imagBackground =  cvzone.cornerRect(imgBackground,bbox,rt=0)
+            id = studentIds[matchIndex]
+            if counter == 0 :
+                counter = 1
+                modeType = 0
+
+    if counter!=0:
+        if counter == 1:
+            studentInfo = db.reference(f'Students/{id}').get()
+            print(studentInfo)
+
+        cv2.putText(imgBackground,str(studentInfo['name']),(1112,604),
+                    cv2.FONT_HERSHEY_DUPLEX,1,(0,0,0),2)
+        cv2.putText(imgBackground, str(studentInfo), (1112, 640),
+                    cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+        cv2.putText(imgBackground, str(studentIds['section']), (1112, 675),
+                    cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+        counter +=1
 
     cv2.imshow("face attendance", imgBackground)  # to output the camera!!
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    cv2.waitKey(1)
 
 cap.release()
 cv2.destroyAllWindows()
