@@ -15,7 +15,7 @@ firebase_admin.initialize_app(cred,{
 
 # importing student Images
 
-folderPath = 'D:\PROGRAMMING\PROJECTS\Student Participation Tracker\FaceRecognition\Images'
+folderPath = 'Images'
 PathList = os.listdir(folderPath)
 imgList = []
 studentIds = []  # we need student also

@@ -8,6 +8,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import storage
+from datetime import datetime
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred,{
@@ -40,7 +41,7 @@ encodeListKnown, studentIds = encodeListKnownwithIds
 print("Encoded file loaded")  #printing the status of load
 
 
-modeType = 1
+modeType = 3
 counter = 0
 id = -1
 # imgStudent = []
@@ -104,7 +105,13 @@ while True:
 
 
             #update data of attendance in firebase
+            datatimeObject = datetime.strptime(studentInfo['last_attendance_time'],"%y-%m-%d %H:%M:%S")
 
+            secondsElapsed = (datetime.now()-datetimeObject).total_seconds()
+            ref = db.reference(f'Students/{id}')
+            studentInfo['total_attendance']+=1
+            ref.child('total_attendance').set(studentInfo['total_attendance'])
+            ref.child('last_attendance_time').set(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 
         cv2.putText(imgBackground,str(studentInfo['name']),(1112,604),
@@ -118,6 +125,15 @@ while True:
 
 
         counter +=1
+
+        # if studentInfo['total_attendance'] > 1:
+
+
+        if counter > 10 :
+            counter = 0
+            modeType = 3
+            studentInfo = []
+
 
     cv2.imshow("face attendance", imgBackground)  # to output the camera!!
     cv2.waitKey(1)
