@@ -1,15 +1,17 @@
 import { Routes, Route } from "react-router-dom";
 
 import "./App.css";
-import IndexPage from "./pages/IndexPage";
-import LoginPage from "./pages/LoginPage";
+// import IndexPage from "./pages/IndexPage";
+// import LoginPage from "./pages/LoginPage";
 
 import Layout from "./Layout";
-import RegistePage from "./pages/RegisterPage";
+import RegistrationForm from "./pages/register";
+import Test from "./pages/test";
 import axios from "axios";
 import { UserContextProvider } from "./UserContext";
-import AccountPage from "./pages/AccountPage";
-import ForgetPassPage from "./pages/ForgetPassPage";
+import LoginForm from "./pages/login";
+import EventAddForm from "./pages/event/add";
+import EventPage from "./pages/event/event";
 
 // axios.defaults.baseURL = "http://localhost:5000";
 
@@ -28,13 +30,18 @@ function App() {
 		<UserContextProvider>
 			<Routes>
 				<Route path="/" element={<Layout />}>
-					<Route index element={<IndexPage />} />
+					{/* <Route index element={<IndexPage />} />
 					<Route path="/account/:subpage?" element={<AccountPage />} />
-					<Route path="/account/:subpage/:action" element={<AccountPage />} />
+					<Route path="/account/:subpage/:action" element={<AccountPage />} /> */}
+					<Route path="/events/add" element={<EventAddForm />} />
+				<Route path="/test" element={<Test />} />
+				<Route path="/events" element={<EventPage/>} />
 				</Route>
-				<Route path="/register" element={<RegistePage />} />
-				<Route path="/login" element={<LoginPage />} />
-				<Route path="/forget/:subpage?" element={<ForgetPassPage />} />
+				<Route path="/register" element={<RegistrationForm />} />
+				<Route path="/login" element={<LoginForm />} />
+				
+				{/* <Route path="/login" element={<LoginPage />} />
+				<Route path="/forget/:subpage?" element={<ForgetPassPage />} /> */}
 			</Routes>
 		</UserContextProvider>
 	);
