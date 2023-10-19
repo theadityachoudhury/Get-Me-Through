@@ -1,0 +1,19 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adityasubham03/fuzzy-spork.git"
+  },
+  "author": "Aditya Choudhury",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adityasubham03/fuzzy-spork/issues"
+  },
+  "homepage": "https://github.com/adityasubham03/fuzzy-spork#readme"
+}
