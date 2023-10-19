@@ -29,7 +29,7 @@ const RegistrationForm = () => {
 		await faceapi.nets.faceExpressionNet.loadFromUri("/models");
 
 		startVideo();
-		// faceMyDetect();
+		faceMyDetect();
 	};
 
 	const calculateEyeAspectRatio = (eye) => {
