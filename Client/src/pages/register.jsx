@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 const RegistrationForm = () => {
 	const [username, setUsername] = useState("");
+	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [cpassword, setcPassword] = useState("");
 	const [image, setImage] = useState(null);
@@ -11,9 +12,10 @@ const RegistrationForm = () => {
 	const videoRef = useRef(null);
 	const canvasRef = useRef(null);
 	const [usernameErrors, setUsernameErrors] = useState(false);
+	const [emailErrors, setEmailErrors] = useState(false);
 	const streamRef = useRef(null);
 	const [isLive, setIsLive] = useState(false);
-	const [isTyping, setIsTyping] = useState(false);
+	// const [isTyping, setIsTyping] s= useState(false);
   	const timeoutRef = useRef(null);
 
 	useEffect(() => {
@@ -300,10 +302,7 @@ const RegistrationForm = () => {
 				// Perform liveness detection on the captured image
 				await performLivenessDetection(capturedImage);
 
-				if (isLive) {
-					// Proceed with user registration
-					// You can add your registration logic here
-				} else {
+				if (!isLive) {
 					handleRecapture();
 					alert("Liveness detection failed. Please try again.");
 				}
@@ -326,9 +325,18 @@ const RegistrationForm = () => {
 
 		timeoutRef.current = setTimeout(() => {
 			setUsernameErrors( Math.random() < 0.5);
-		  setIsTyping(false);
 		}, 1000); 
 	};
+
+	const handleEmailChange = (e) => {
+		setEmail(e.target.value);
+		clearTimeout(timeoutRef.current);
+
+		timeoutRef.current = setTimeout(() => {
+			setEmailErrors( Math.random() < 0.5);
+		}, 1000); 
+	};
+
 	const handlePasswordChange = (e) => {
 		setPassword(e.target.value);
 	};
@@ -368,6 +376,31 @@ const RegistrationForm = () => {
 								<div className="p-1 mb-4 text-sm text-red-800 " role="alert">
 									<span className="font-medium">Username Taken!!</span> Choose a
 									new username!!
+								</div>
+							</div>
+						) : (
+							<div></div>
+						)}
+					</div>
+
+					<div className="mb-4">
+						<label htmlFor="email" className="block mb-2">
+							Email:
+						</label>
+						<input
+							type="email"
+							id="email"
+							value={email}
+							onChange={handleEmailChange}
+							className="border border-gray-300 rounded px-2 py-1"
+							required
+						/>
+
+						{emailErrors ? (
+							<div>
+								<div className="p-1 mb-4 text-sm text-red-800 " role="alert">
+									<span className="font-medium">Email Taken!!</span> Choose a
+									new Email!!
 								</div>
 							</div>
 						) : (
