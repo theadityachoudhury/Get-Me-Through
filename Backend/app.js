@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 const { DB, REQUEST_TIMEOUT, PORT } = require("./config/db");
+const auth = require("./routes/auth-routes");
 
 const app = express();
 
@@ -34,6 +35,8 @@ app.get("/api/health", (req, res) => {
     });
 });
 
+app.use("/api/auth", auth);
+
 
 
 app.use((req, res) => {
@@ -50,10 +53,11 @@ app.use((req, res) => {
 const startApp = async () => {
     try {
         // Connection With DB
-        await connect(DB, {
+        await connect(DB + "/getmethrough", {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             serverSelectionTimeoutMS: REQUEST_TIMEOUT,
+            writeConcern: { w: 'majority' },
         });
 
         success({
