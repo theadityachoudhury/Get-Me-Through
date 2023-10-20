@@ -3,10 +3,11 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
 const { JWT_SECRET, JWT_REFRESH_TOKEN_SECRET } = require("../../config/db");
-const { signupSchema, validateEmail, validateUsername, loginSchema } = require("../Validators/Auth/validators");
+const { signupSchema, validateEmail, validateUsername, loginSchema, PasswordSchema } = require("../Validators/Auth/validators");
 const Users = require("../../models/Users");
 const RefreshToken = require("../../models/refreshToken");
 const Auth = require("../../models/auth");
+const { mailer } = require("../Mailer/mailer");
 
 
 const Login_MSG = {
@@ -130,11 +131,14 @@ const register = async (req, res, next) => {
 
         await newUser.save({ writeConcern: { w: 'majority' } });
 
-        return res.status(201).json({
+        res.status(201).json({
             message: Register_MSG.signupSuccess,
             success: true,
         });
 
+        mailer(signupRequest.email, "Account Created | Get-Me-Through", `Your Account has been created in the Get-Me-Through portal.<br>To verify your account click on the link:- <a href="https://localhost:5173/verify" target="_blank">https://localhost:5173/verify</a>`, signupRequest.username, "acc_creation");
+
+        return;
     } catch (e) {
         console.log(e);
         let errMsg = Register_MSG.signupError;
@@ -465,6 +469,22 @@ const generate = async (req, res, next) => {
         }
     }
 
+    try {
+        mailer(
+            email,
+            "Account Verification OTP | Get-Me-Through",
+            `Your account verification OTP is :- ${otp}`,
+            username,
+            auth_type
+        );
+    } catch (e) {
+        return res.status(500).json({
+            reason: "error",
+            message: "Internal Server Error! Unable to send E-Mail!! Mailer Error",
+            success: false,
+        });
+    }
+
     return res.status(200).json({
         otp: otp,
         message: "OTP generated successfully and sent to registered E-Mail",
@@ -473,42 +493,130 @@ const generate = async (req, res, next) => {
 };
 
 const verifyUser = async (username, verified) => {
-	let user = await Users.findOne({ username });
-	user.verified = verified;
-	await user.save();
+    let user = await Users.findOne({ username });
+    user.verified = verified;
+    await user.save();
 };
 
 const verify = async (req, res, next) => {
-	const auth_type = "acc_verify";
-	const { username, otp } = req.body;
-	if (validateUsername(username)) {
-		let auth = await Auth.findOne({ username, auth_type: auth_type });
-		if (auth) {
-			if (auth.otp === otp) {
-				verifyUser(username, true);
-				await Auth.findByIdAndDelete(auth._id);
-				// console.log(req._id);
+    const auth_type = "acc_verify";
+    const { username, otp } = req.body;
+    if (validateUsername(username)) {
+        let auth = await Auth.findOne({ username, auth_type: auth_type });
+        if (auth) {
+            if (auth.otp === otp) {
+                verifyUser(username, true);
+                await Auth.findByIdAndDelete(auth._id);
+                // console.log(req._id);
                 res.clearCookie("token");
                 res.clearCookie("refreshToken");
-				return res.status(200).json({
-					message: "Account verified successfully",
-					success: true,
-				});
-			} else {
-				return res.status(401).json({
-					reason: "otp",
-					message: "OTP is wrong",
-					success: false,
-				});
-			}
-		} else {
-			return res.status(403).json({
-				reason: "otp",
-				message: "First generate otp then try verifying the account!",
-				success: false,
-			});
-		}
-	}
+                res.status(200).json({
+                    message: "Account verified successfully",
+                    success: true,
+                });
+
+                mailer(
+                    req.email,
+                    "Account Verification Successful | Get-Me-Through",
+                    `Your account has been successfully verified and activated.`,
+                    username,
+                    auth_type
+                );
+
+            } else {
+                return res.status(401).json({
+                    reason: "otp",
+                    message: "OTP is wrong",
+                    success: false,
+                });
+            }
+        } else {
+            return res.status(403).json({
+                reason: "otp",
+                message: "First generate otp then try verifying the account!",
+                success: false,
+            });
+        }
+    }
+};
+
+const forget = async (req, res, next) => {
+    const auth_type = "pass_reset";
+    const { email } = req.body;
+    const user = await Users.findOne({ email: email });
+    if (!user) {
+        return res.status(404).json({
+            reason: "email",
+            message: "Account associated with this E-Mail Id not found!!",
+            success: false,
+        });
+    }
+    const username = user.username;
+
+    let auth = await Auth.findOne({ email: email, auth_type: auth_type });
+    const currentDate = new Date().toISOString().slice(0, 10); // Get current date in YYYY-MM-DD format
+    const salt = crypto.randomBytes(16).toString("hex"); // Generate a random salt
+    const stringToHash = currentDate + email + username + salt;
+    const otp = hashString(stringToHash);
+    if (auth) {
+        auth.otp = otp;
+    } else {
+        auth = new Auth({
+            email,
+            username,
+            auth_type,
+            otp,
+        });
+    }
+    await auth.save();
+    mailer(
+        email,
+        "Password Reset Link | Get-Me-Through",
+        `To reset your password click this link:- <a href="http://localhost:5173/forget/${otp}" target="_blank">http://localhost:5173/forget/${otp}</a>`,
+        username,
+        auth_type
+    );
+    return res.status(200).json({
+        message: "Password Reset Link Sent to the E-Mail ID",
+        success: true,
+    });
+};
+
+const forgetIsValid = async (req, res, next) => {
+    const auth_type = "pass_reset";
+    const { otp } = req.params;
+    const auth = await Auth.findOne({ otp: otp, auth_type: auth_type });
+    // console.log(auth);
+
+    return auth ? res.status(200).json() : res.status(404).json();
+};
+
+const forget_save = async (req, res, next) => {
+    const auth_type = "pass_reset";
+    const { password, otp } = req.body;
+    try {
+        const LoginRequest = await PasswordSchema.validateAsync(req.body);
+        const auth = await Auth.findOne({ otp: otp, auth_type: auth_type });
+        if (!auth) {
+            return res.status(404).json();
+        }
+        const user = await Users.findOne({
+            username: auth.username,
+            email: auth.email,
+        });
+        if (!user) {
+            return res.status(404).json();
+        }
+        user.password = await bcrypt.hash(password, 12);
+        await user.save();
+        await Auth.findByIdAndDelete(auth._id);
+        return res.json();
+    } catch (err) {
+        console.log(err);
+        return res
+            .status(400)
+            .json("Please try again with password with min. 8 characters");
+    }
 };
 
 
@@ -522,5 +630,8 @@ module.exports = {
     verifyRefreshToken,
     logout,
     generate,
-    verify
+    verify,
+    forget,
+    forgetIsValid,
+    forget_save,
 };
