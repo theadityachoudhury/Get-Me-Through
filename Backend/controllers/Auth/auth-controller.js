@@ -6,6 +6,7 @@ const { JWT_SECRET, JWT_REFRESH_TOKEN_SECRET } = require("../../config/db");
 const { signupSchema, validateEmail, validateUsername, loginSchema } = require("../Validators/Auth/validators");
 const Users = require("../../models/Users");
 const RefreshToken = require("../../models/refreshToken");
+const Auth = require("../../models/auth");
 
 
 const Login_MSG = {
@@ -425,6 +426,92 @@ const logout = async (req, res, next) => {
 };
 
 
+const generate = async (req, res, next) => {
+    const otp_len = 6;
+    const auth_type = "acc_verify";
+    let otp;
+    const email = req.email;
+    const username = req.body.username;
+
+    let auth;
+    try {
+        auth = await Auth.findOne({ username, auth_type: auth_type });
+    } catch (err) {
+        return res.status(500).json({
+            reason: "error",
+            message: "Internal Server Error! Cannot generate OTP!",
+            success: false,
+        });
+    }
+    if (auth) {
+        otp = auth.otp;
+    } else {
+        otp = otpgen(otp_len);
+        auth = new Auth({
+            email,
+            username,
+            auth_type,
+            otp,
+        });
+
+        try {
+            await auth.save();
+        } catch (err) {
+            return res.status(500).json({
+                reason: "error",
+                message: "Internal Server Error! Cannot generate OTP!",
+                success: false,
+            });
+        }
+    }
+
+    return res.status(200).json({
+        otp: otp,
+        message: "OTP generated successfully and sent to registered E-Mail",
+        success: true,
+    });
+};
+
+const verifyUser = async (username, verified) => {
+	let user = await Users.findOne({ username });
+	user.verified = verified;
+	await user.save();
+};
+
+const verify = async (req, res, next) => {
+	const auth_type = "acc_verify";
+	const { username, otp } = req.body;
+	if (validateUsername(username)) {
+		let auth = await Auth.findOne({ username, auth_type: auth_type });
+		if (auth) {
+			if (auth.otp === otp) {
+				verifyUser(username, true);
+				await Auth.findByIdAndDelete(auth._id);
+				// console.log(req._id);
+                res.clearCookie("token");
+                res.clearCookie("refreshToken");
+				return res.status(200).json({
+					message: "Account verified successfully",
+					success: true,
+				});
+			} else {
+				return res.status(401).json({
+					reason: "otp",
+					message: "OTP is wrong",
+					success: false,
+				});
+			}
+		} else {
+			return res.status(403).json({
+				reason: "otp",
+				message: "First generate otp then try verifying the account!",
+				success: false,
+			});
+		}
+	}
+};
+
+
 
 module.exports = {
     register,
@@ -434,4 +521,6 @@ module.exports = {
     refresh,
     verifyRefreshToken,
     logout,
+    generate,
+    verify
 };
