@@ -19,7 +19,6 @@ const loginSchema = Joi.object({
         .pattern(new RegExp("^[a-zA-Z0-9!@#$%^&*()_]{3,30}$"))
         .min(8)
         .required(),
-    face: Joi.string().required(),
 });
 
 const PasswordSchema = Joi.object({
@@ -68,6 +67,18 @@ const checkloggedin = (req, res, next) => {
     }
 };
 
+const isAdmin = (req, res, next) => {
+    if (req.role === "admin") {
+        next();
+    } else {
+        return res.status(400).json({
+            reson: "unauthorized",
+            message: "You are not allowed to add/manage events!. If this is a mistake please contact the administrator!",
+            success: false,
+        });
+    }
+}
+
 const verification = (req, res, next) => {
     if (req.verified) {
         return res.status(200).json({
@@ -101,4 +112,5 @@ module.exports = {
     checkloggedin,
     verification,
     isOTP,
+    isAdmin,
 };

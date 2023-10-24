@@ -6,6 +6,7 @@ const cors = require("cors");
 
 const { DB, REQUEST_TIMEOUT, PORT } = require("./config/db");
 const auth = require("./routes/auth-routes");
+const event = require("./routes/events-routes");
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", auth);
+app.use("/api/events", event);
 
 
 

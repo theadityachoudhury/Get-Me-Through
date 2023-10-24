@@ -104,6 +104,7 @@ function hashString(string) {
     return hash.digest("hex");
 }
 
+
 //Public API functions starts here
 const register = async (req, res, next) => {
     try {
@@ -140,7 +141,7 @@ const register = async (req, res, next) => {
 
         return;
     } catch (e) {
-        console.log(e);
+        // console.log(e);
         let errMsg = Register_MSG.signupError;
         if (e.isJoi === true) {
             e.status = 403;
@@ -223,7 +224,7 @@ const login = async (req, res, next) => {
                             message: "Unable to generate refresh token",
                             success: false,
                         });
-                        console.error(err);
+                        // console.error(err);
                     });
             }
 
@@ -250,7 +251,7 @@ const login = async (req, res, next) => {
         }
 
     } catch (e) {
-        console.log(e);
+        // console.log(e);
         let errorMsg = Login_MSG.loginError;
         if (e.isJoi === true) {
             e.status = 403;
@@ -310,10 +311,10 @@ const verifytoken = (req, res, next) => {
             return res.status(200).json(null);
         } else {
             req._id = user.user_id;
-            req.body.username = user.username;
+            req.username = user.username;
             req.token = token;
             req.email = user.email;
-            req.body.role = user.role;
+            req.role = user.role;
             req.verified = user.verified;
             next();
         }
@@ -362,7 +363,7 @@ const verifyRefreshToken = async (req, res, next) => {
 
     jwt.verify(String(token), JWT_REFRESH_TOKEN_SECRET, (err, user) => {
         if (err) {
-            console.log(err);
+            // console.log(err);
             return res.status(200).json(null);
         } else {
             req._id = user.user_id;
@@ -422,7 +423,7 @@ const logout = async (req, res, next) => {
                     return res.status(200).json(null);
                 })
                 .catch((err) => {
-                    console.error(err.message);
+                    // console.error(err.message);
                     return res.status(200).json(null);
                 });
         }
@@ -612,7 +613,7 @@ const forget_save = async (req, res, next) => {
         await Auth.findByIdAndDelete(auth._id);
         return res.json();
     } catch (err) {
-        console.log(err);
+        // console.log(err);
         return res
             .status(400)
             .json("Please try again with password with min. 8 characters");
