@@ -1,8 +1,12 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import * as faceapi from "face-api.js";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import axios from "axios";
+import { UserContext } from "../UserContext";
+import toast, { Toaster } from "react-hot-toast";
 
 const LoginForm = () => {
+	const { setUser, user,delay } = useContext(UserContext);
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	// const [cpassword, setcPassword] = useState("");
@@ -10,16 +14,12 @@ const LoginForm = () => {
 	const [captured, setCaptured] = useState(false); // Track whether an image is captured
 	const videoRef = useRef(null);
 	const canvasRef = useRef(null);
-	const [usernameErrors, setUsernameErrors] = useState(false);
 	const streamRef = useRef(null);
 	const [isLive, setIsLive] = useState(false);
-	const [isTyping, setIsTyping] = useState(false);
-  	const timeoutRef = useRef(null);
 
 	useEffect(() => {
 		loadModels();
 	}, []);
-	  
 
 	// Load face-api.js models and start the video stream
 	const loadModels = async () => {
@@ -71,7 +71,7 @@ const LoginForm = () => {
 		if (detections.length > 1) {
 			alert("Multiple faces detected!!");
 			setIsLive(false);
-			return
+			return;
 		}
 
 		// Check for eye blinks
@@ -322,12 +322,6 @@ const LoginForm = () => {
 
 	const handleUsernameChange = (e) => {
 		setUsername(e.target.value);
-		clearTimeout(timeoutRef.current);
-
-		timeoutRef.current = setTimeout(() => {
-			setUsernameErrors( Math.random() < 0.5);
-		  setIsTyping(false);
-		}, 1000); 
 	};
 	const handlePasswordChange = (e) => {
 		setPassword(e.target.value);
@@ -336,15 +330,63 @@ const LoginForm = () => {
 	// 	setcPassword(e.target.value);
 	// };
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 		console.log("clicked");
 		// Handle form submission
 		// You can add your registration logic here
+		let data = JSON.stringify({
+			username: username,
+			password: password,
+			face: image,
+		});
+
+		let config = {
+			method: "post",
+			maxBodyLength: Infinity,
+			url: "/api/auth/login",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			data: data,
+		};
+
+		// let response;
+		// try {
+		// 	response = await axios.request(config);
+		// 	console.log(response.data);
+		// } catch (error) {
+		// 	console.log(error);
+		// }
+
+		try {
+			// Your async logic, for example, making an API request
+			// const loadingToast = toast.loading("Submitting...");
+			const response = await axios.request(config);
+			// console.log(response.data.message);
+			setUser(response.data.data, { isAuthenticated: true });
+			console.log(user);
+			toast.success("Success: " + response.data.message);
+			setUsername("");
+			setPassword("");
+			
+		} catch (error) {
+			// Handle errors
+			console.error(error);
+			let errorData = error.response
+				? error.response.data.message
+				: "An unexpected error occured!!";
+			toast.error(errorData);
+		}
 	};
+
+	if (user) {
+		return <Navigate to={"/events"} />;
+	}
 
 	return (
 		<div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
+			<Toaster position="top-right" reverseOrder={true} />
 			<div className="w-full max-w-md p-8 bg-white rounded shadow-md">
 				<h2 className="text-2xl font-bold mb-4 text-center">
 					Facial Recognition Registration
@@ -362,17 +404,6 @@ const LoginForm = () => {
 							className="border border-gray-300 rounded px-2 py-1"
 							required
 						/>
-
-						{usernameErrors ? (
-							<div>
-								<div className="p-1 mb-4 text-sm text-red-800 " role="alert">
-									<span className="font-medium">Username Taken!!</span> Choose a
-									new username!!
-								</div>
-							</div>
-						) : (
-							<div></div>
-						)}
 					</div>
 
 					<div className="mb-4">
@@ -412,7 +443,6 @@ const LoginForm = () => {
 							<div></div>
 						)}
 					</div> */}
-
 
 					{!captured ? (
 						<div className="mb-4 relative">
@@ -457,18 +487,24 @@ const LoginForm = () => {
 							</div>
 						</div>
 					)}
-					{ captured && !usernameErrors ? (<button
-						type="submit"
-						className="bg-green-500 text-white px-4 py-2 rounded">
-						Register
-					</button>) : (<button
-						type="submit"
-						className="bg-green-500 text-white px-4 py-2 rounded" disabled>
-						Register
-					</button>)  }
-					
-                </form>
-                <p className="mt-3 text-center text-red">Don't have an account yet? <Link to="/register">Register Here</Link></p>
+					{captured ? (
+						<button
+							type="submit"
+							className="bg-green-500 text-white px-4 py-2 rounded">
+							Register
+						</button>
+					) : (
+						<button
+							type="submit"
+							className="bg-green-500 text-white px-4 py-2 rounded"
+							disabled>
+							Register
+						</button>
+					)}
+				</form>
+				<p className="mt-3 text-center text-red">
+					Don't have an account yet? <Link to="/register">Register Here</Link>
+				</p>
 			</div>
 		</div>
 	);
