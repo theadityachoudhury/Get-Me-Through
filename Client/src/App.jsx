@@ -12,6 +12,8 @@ import { UserContextProvider } from "./UserContext";
 import LoginForm from "./pages/login";
 import EventAddForm from "./pages/event/add";
 import EventPage from "./pages/event/event";
+import LoginForm2 from "./pages/login2";
+import Dashboard from "./pages/dashboard";
 
 // axios.defaults.baseURL = "http://localhost:5000";
 
@@ -34,12 +36,15 @@ function App() {
 					<Route path="/account/:subpage?" element={<AccountPage />} />
 					<Route path="/account/:subpage/:action" element={<AccountPage />} /> */}
 					<Route path="/events/add" element={<EventAddForm />} />
-				<Route path="/test" element={<Test />} />
-				<Route path="/events" element={<EventPage/>} />
+					<Route path="/test" element={<Test />} />
+					<Route path="/events" element={<EventPage />} />
+					<Route path="/login2" element={<LoginForm />} />
+					<Route path="/dashboard" element={<Dashboard/>}/>
+					
 				</Route>
+				<Route path="/login" element={<LoginForm2 />} />
 				<Route path="/register" element={<RegistrationForm />} />
-				<Route path="/login" element={<LoginForm />} />
-				
+
 				{/* <Route path="/login" element={<LoginPage />} />
 				<Route path="/forget/:subpage?" element={<ForgetPassPage />} /> */}
 			</Routes>

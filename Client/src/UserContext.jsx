@@ -7,6 +7,8 @@ export function UserContextProvider({ children }) {
 	const [user, setUser] = useState(null);
 	const [ready, setReady] = useState(false);
 
+	
+
 	const fetchUser = () => {
 		axios
 			.get("/api/auth/user")
@@ -57,7 +59,7 @@ export function UserContextProvider({ children }) {
 		// Refresh the access token every 8 minutes
 		const refreshAccessTokenInterval = setInterval(
 			refreshAccessToken,
-			8 * 60 * 1000
+			0.4 * 60 * 1000
 			// 10*1000
 		);
 
