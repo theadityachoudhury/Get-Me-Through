@@ -1,8 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import * as faceapi from "face-api.js";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 const RegistrationForm = () => {
+	const [params] = useSearchParams();
+	const callback = params.get("callback");
 	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -16,12 +20,19 @@ const RegistrationForm = () => {
 	const streamRef = useRef(null);
 	const [isLive, setIsLive] = useState(false);
 	// const [isTyping, setIsTyping] s= useState(false);
-  	const timeoutRef = useRef(null);
+	const timeoutRef = useRef(null);
 
 	useEffect(() => {
 		loadModels();
+
+		// Add a cleanup function to stop the video stream when unmounting
+		return () => {
+			if (streamRef.current) {
+				const tracks = streamRef.current.getTracks();
+				tracks.forEach((track) => track.stop());
+			}
+		};
 	}, []);
-	  
 
 	// Load face-api.js models and start the video stream
 	const loadModels = async () => {
@@ -73,7 +84,7 @@ const RegistrationForm = () => {
 		if (detections.length > 1) {
 			alert("Multiple faces detected!!");
 			setIsLive(false);
-			return
+			return;
 		}
 
 		// Check for eye blinks
@@ -204,6 +215,7 @@ const RegistrationForm = () => {
 		);
 	}
 
+	// Defines a function to draw lines for the face
 	const faceMyDetect = () => {
 		setInterval(async () => {
 			if (!captured && videoRef.current) {
@@ -264,6 +276,7 @@ const RegistrationForm = () => {
 			});
 	};
 
+	// Handles the clicking of the picture
 	const handleCapture = async () => {
 		const video = videoRef.current;
 
@@ -313,46 +326,115 @@ const RegistrationForm = () => {
 		}
 	};
 
+	// Handles the recapturing of the image
 	const handleRecapture = () => {
 		setImage(null); // Clear the captured image
 		setCaptured(false); // Reset the captured state
 		startVideo();
 	};
 
+	// Handles the input change of field :- username
 	const handleUsernameChange = (e) => {
 		setUsername(e.target.value);
 		clearTimeout(timeoutRef.current);
 
-		timeoutRef.current = setTimeout(() => {
-			setUsernameErrors( Math.random() < 0.5);
-		}, 1000); 
+		timeoutRef.current = setTimeout(async () => {
+			try {
+				const { data } = await axios.get(
+					`/api/auth/checkUsername/${e.target.value}`
+				);
+				// console.log(data);
+				setUsernameErrors(!data);
+			} catch (err) {
+				setUsernameErrors(true);
+			}
+		}, 1000);
 	};
 
+	// Handles the input change of field :- email
 	const handleEmailChange = (e) => {
 		setEmail(e.target.value);
 		clearTimeout(timeoutRef.current);
 
-		timeoutRef.current = setTimeout(() => {
-			setEmailErrors( Math.random() < 0.5);
-		}, 1000); 
+		timeoutRef.current = setTimeout(async () => {
+			try {
+				const { data } = await axios.get(
+					`/api/auth/checkEmail/${e.target.value}`
+				);
+				// console.log(data);
+				setEmailErrors(!data);
+			} catch (err) {
+				setEmailErrors(true);
+			}
+		}, 1000);
 	};
 
+	// Handles the input change of field :- password
 	const handlePasswordChange = (e) => {
 		setPassword(e.target.value);
 	};
+
+	// Handles the input change of field :- confirm password
 	const handlecPasswordChange = (e) => {
 		setcPassword(e.target.value);
 	};
 
-	const handleSubmit = (e) => {
+	// Handles the submitting of the form
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 		console.log("clicked");
+		let data = JSON.stringify({
+			username: username,
+			password: password,
+			email: email,
+			face: image,
+		});
+
+		let config = {
+			method: "post",
+			maxBodyLength: Infinity,
+			url: "/api/auth/register",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			data: data,
+		};
+
+		// let response;
+		// try {
+		// 	response = await axios.request(config);
+		// 	console.log(response.data);
+		// } catch (error) {
+		// 	console.log(error);
+		// }
+
+		try {
+			// Your async logic, for example, making an API request
+			// const loadingToast = toast.loading("Submitting...");
+			const response = await axios.request(config);
+			// console.log(response.data.message);
+			toast.success("Success: " + response.data.message);
+			setUsername("");
+			setEmail("");
+			setPassword("");
+			setcPassword("");
+			handleRecapture();
+		} catch (error) {
+			// Handle errors
+			console.error(error);
+			let errorData = error.response
+				? error.response.data.message
+				: "An unexpected error occured!!";
+			toast.error(errorData);
+		}
+
 		// Handle form submission
 		// You can add your registration logic here
 	};
 
 	return (
 		<div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
+			<Toaster position="top-right" reverseOrder={true} />
 			<div className="w-full max-w-md p-8 bg-white rounded shadow-md">
 				<h2 className="text-2xl font-bold mb-4 text-center">
 					Facial Recognition Registration
@@ -435,7 +517,7 @@ const RegistrationForm = () => {
 							required
 						/>
 
-{cpassword!="" && password!=cpassword ? (
+						{cpassword != "" && password != cpassword ? (
 							<div>
 								<div className="p-1 mb-4 text-sm text-red-800 " role="alert">
 									<span className="font-medium">Password Doesn't Match</span>
@@ -445,7 +527,6 @@ const RegistrationForm = () => {
 							<div></div>
 						)}
 					</div>
-
 
 					{!captured ? (
 						<div className="mb-4 relative">
@@ -490,18 +571,29 @@ const RegistrationForm = () => {
 							</div>
 						</div>
 					)}
-					{ captured && password==cpassword && !usernameErrors ? (<button
-						type="submit"
-						className="bg-green-500 text-white px-4 py-2 rounded">
-						Register
-					</button>) : (<button
-						type="submit"
-						className="bg-green-500 text-white px-4 py-2 rounded" disabled>
-						Register
-					</button>)  }
-					
+					{captured && password == cpassword && !usernameErrors ? (
+						<button
+							type="submit"
+							className="bg-green-500 text-white px-4 py-2 rounded">
+							Register
+						</button>
+					) : (
+						<button
+							type="submit"
+							className="bg-green-500 text-white px-4 py-2 rounded"
+							disabled>
+							Register
+						</button>
+					)}
 				</form>
-				<p className="mt-3 text-center text-red">Already have an account? <Link to="/login">Login Here</Link></p>
+				<p className="mt-3 text-center text-red">
+					Already have an account?{" "}
+					{callback ? (
+						<Link to={"/login?callback=" + callback}>Login Here</Link>
+					) : (
+						<Link to={"/login?"}>Login Here</Link>
+					)}
+				</p>
 			</div>
 		</div>
 	);
