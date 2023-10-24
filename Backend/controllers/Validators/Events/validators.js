@@ -15,4 +15,21 @@ const eventSchema = Joi.object({
     tags: Joi.array().items(Joi.string()),
 });
 
-module.exports = { eventSchema };
+const eventUpdateSchema = Joi.object({
+    title: Joi.string().required().optional().default(null),
+    description: Joi.string().optional().default(null),
+    date: Joi.date().optional().default(null),
+    location: Joi.string().optional().default(null),
+    organizer: Joi.string().optional().default(null),
+    category: Joi.string().optional().default(null),
+    registrationFee: Joi.number().optional().default(null),
+    capacity: Joi.number().required().optional().default(null),
+    registrationDeadline: Joi.date().optional().default(null),
+    status: Joi.string().valid('upcoming', 'past', 'canceled').optional().default(null),
+    tags: Joi.array().items(Joi.string()).optional().default(null),
+});
+
+module.exports = {
+    eventSchema,
+    eventUpdateSchema,
+};

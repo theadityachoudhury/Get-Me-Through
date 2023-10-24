@@ -1,5 +1,5 @@
 const events = require("../../models/events");
-const { eventSchema } = require("../Validators/Events/validators");
+const { eventSchema, eventUpdateSchema } = require("../Validators/Events/validators");
 
 const addEvents = async (req, res, next) => {
     try {
@@ -51,10 +51,10 @@ const getEvent = async (req, res, next) => {
         if (event) {
             return res.status(200).json(event);
         } else {
-            return res.status(400);
+            return res.status(400).json();
         }
     } catch (e) {
-        return res.status(400);
+        return res.status(400).json();
     }
 };
 
@@ -70,12 +70,37 @@ const deleteEvent = async (req, res, next) => {
 };
 
 const updateEvent = async (req, res, next) => {
-    
+    const { eventId } = req.params;
+    if (!eventId) {
+        return res.status(404).json();
+    }
+
+    try {
+        const eventUpdateRequest = await eventUpdateSchema.validateAsync(req.body);
+        const event = await events.findById(eventId);
+        event.title = eventUpdateRequest.title || event.title;
+        event.description = eventUpdateRequest.description || event.description;
+        event.date = eventUpdateRequest.date || event.date;
+        event.location = eventUpdateRequest.location || event.location;
+        event.organizer = eventUpdateRequest.organizer || event.organizer;
+        event.category = eventUpdateRequest.category || event.category;
+        event.registrationFee = eventUpdateRequest.registrationFee || event.registrationFee;
+        event.capacity = eventUpdateRequest.capacity || event.capacity;
+        event.registrationDeadline = eventUpdateRequest.registrationDeadline || event.registrationDeadline;
+        event.status = eventUpdateRequest.status || event.status;
+        event.tags = eventUpdateRequest.tags || event.tags;
+        await event.save();
+        return res.status(200).json();
+    } catch (e) {
+        return res.status(400).json();
+
+    }
 }
 
 module.exports = {
     addEvents,
     getEvents,
     getEvent,
-    updateEvent
+    updateEvent,
+    deleteEvent
 }

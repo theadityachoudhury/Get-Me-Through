@@ -60,18 +60,16 @@ const EventModalEdit = ({ event, onClose, isOpen, onEditSuccess }) => {
 		}
 
 		axios
-			.put(`/api/events/update/${event._id}`, updatedData)
+			.put(`/api/events/${event._id}`, updatedData)
 			.then((response) => {
 				if (response.status === 200) {
-					toast.success("Success: " + response.data.message);
+					toast.success("Successfully updated the data!!");
 					onEditSuccess({ ...event, ...updatedData });
 				}
 			})
 			.catch((error) => {
-				const errorData = error.response
-					? error.response.data.message
-					: "An unexpected error occurred!!";
-				toast.error(errorData);
+				toast.error("An error occurred!!");
+				toast.error("Unable to update the data!! Please try again later!!");
 			});
 	};
 
