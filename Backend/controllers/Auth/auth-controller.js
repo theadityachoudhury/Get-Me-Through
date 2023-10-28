@@ -301,7 +301,6 @@ const getuser = async (req, res, next) => {
 
 const verifytoken = (req, res, next) => {
     const { token, refreshToken } = req.cookies;
-
     if (!token) {
         return res.status(200).json(null);
     }
@@ -462,6 +461,7 @@ const generate = async (req, res, next) => {
         try {
             await auth.save();
         } catch (err) {
+            console.log(err);
             return res.status(500).json({
                 reason: "error",
                 message: "Internal Server Error! Cannot generate OTP!",
@@ -621,6 +621,24 @@ const forget_save = async (req, res, next) => {
 };
 
 
+const updateUser = async (req, res, next) => {
+    try {
+        const user = await Users.findById(req._id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "No user found!!", reason: "user" });
+        }
+
+        user.name = req.body.name || user.name;
+        user.mobile = req.body.mobile || user.mobile;
+        user.address = req.body.address || user.address;
+
+        await user.save();
+        return res.status(200).json();
+    } catch (err) {
+        return res.status(500).json();
+    }
+}
+
 
 module.exports = {
     register,
@@ -635,4 +653,5 @@ module.exports = {
     forget,
     forgetIsValid,
     forget_save,
+    updateUser
 };

@@ -49,6 +49,7 @@ const EventModalEdit = ({ event, onClose, isOpen, onEditSuccess }) => {
 		const updatedData = {};
 
 		for (const key in formData) {
+			if (key === "tagsInput") continue;
 			if (formData[key] !== event[key]) {
 				updatedData[key] = formData[key];
 			}
@@ -92,9 +93,9 @@ const EventModalEdit = ({ event, onClose, isOpen, onEditSuccess }) => {
 				<h2 className="text-center text-5xl font-bold m-5">Event Details</h2>
 
 				<div
-					className="modal-content-scrollable"
+					className="modal-content-scrollable custom-scroll overflow-y-scroll"
 					style={{ maxHeight: "500px", overflowY: "scroll" }}>
-					<form onSubmit={handleSaveChanges}>
+					<form className="mr-4" onSubmit={handleSaveChanges}>
 						{/* Title */}
 						<div className="mb-4 flex items-center">
 							<label htmlFor="title" className="text-lg font-semibold w-1/3">

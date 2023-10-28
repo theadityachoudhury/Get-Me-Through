@@ -3,10 +3,12 @@ const { connect } = require("mongoose");
 const { success, error } = require("consola");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const { initializeFirebase } = require("./config/firebase");
 
 const { DB, REQUEST_TIMEOUT, PORT } = require("./config/db");
 const auth = require("./routes/auth-routes");
 const event = require("./routes/events-routes");
+const User = require("./models/Users");
 
 const app = express();
 
@@ -39,6 +41,24 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", auth);
 app.use("/api/events", event);
 
+app.get("/update-users", async (req, res) => {
+    try {
+        const updateQuery = {
+            $set: {
+                name: null, // Set default value for 'name' to null
+                mobile: null, // Set default value for 'mobile' to null
+                address: null, // Set default value for 'address' to null
+            },
+        };
+
+        const result = await User.updateMany({}, updateQuery);
+
+        res.json({ message: "Updated successfully", result });
+    } catch (error) {
+        res.status(500).json({ error: "Error updating users", details: error.message });
+    }
+});
+
 
 
 app.use((req, res) => {
@@ -61,6 +81,8 @@ const startApp = async () => {
             serverSelectionTimeoutMS: REQUEST_TIMEOUT,
             writeConcern: { w: 'majority' },
         });
+
+        initializeFirebase();
 
         success({
             message: `Successfully connected with the Database \n${DB}`,

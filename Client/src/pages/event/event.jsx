@@ -48,7 +48,6 @@ const EventPage = () => {
 						prevEvents.filter((event) => event._id !== eventId)
 					);
 					toast.success("Event deleted successfully");
-					
 				}
 			})
 			.catch((error) => {
@@ -92,6 +91,20 @@ const EventPage = () => {
 		setSelectedEventForEdit(null);
 	};
 
+	const isAttendanceButtonDisabled = (event) => {
+		const eventDate = new Date(event.date);
+		const currentDate = new Date();
+
+		// Calculate the time difference in milliseconds
+		const timeDifference = eventDate - currentDate;
+
+		// Calculate the number of days
+		const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
+		// Disable the button if it's more than 3 days after the event date
+		return daysDifference > 3 || daysDifference < 0;
+	};
+
 	if (user && ready) {
 		return (
 			<div className="event-page p-6 bg-gray-100 mb-10">
@@ -125,6 +138,9 @@ const EventPage = () => {
 								Max Participation
 							</th>
 							<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+								Participants
+							</th>
+							<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 								Actions
 							</th>
 						</tr>
@@ -150,6 +166,9 @@ const EventPage = () => {
 									{event.capacity}
 								</td>
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+									{event.applied}
+								</td>
+								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
 									<button
 										className="mr-2 text-black p-1 w-16 h-8 bg-blue-200 hover:bg-blue-300"
 										onClick={() => handleViewClick(event)}>
@@ -158,6 +177,13 @@ const EventPage = () => {
 
 									{user.role === "admin" && (
 										<>
+											<Link className="pr-2" to={"/events/mark/" + event._id}>
+												<button
+													className="text-black p-1 w-32 h-8 bg-red-200 hover.bg-red-300"
+													disabled={isAttendanceButtonDisabled(event)}>
+													Mark Attendance
+												</button>
+											</Link>
 											<button
 												className="mr-2 text-black p-1 w-16 h-8 bg-green-200 hover:bg-green-300"
 												onClick={() => handleEditClick(event)}>
@@ -170,6 +196,18 @@ const EventPage = () => {
 											</button>
 										</>
 									)}
+
+									{/* {user.role === "attendee" && (
+										<> */}
+									<Link className="px-2" to={"/events/apply/" + event._id}>
+										<button
+											className="text-black p-1 w-16 h-8 bg-red-200 hover.bg-red-300"
+											disabled={event.capacity <= event.applied}>
+											Apply
+										</button>
+									</Link>
+									{/* </>
+									)} */}
 								</td>
 							</tr>
 						))}

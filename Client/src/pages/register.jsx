@@ -1,17 +1,21 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import * as faceapi from "face-api.js";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { UserContext } from "../UserContext";
 
 const RegistrationForm = () => {
 	const [params] = useSearchParams();
 	const callback = params.get("callback");
+	const { setUser, user,ready } = useContext(UserContext);
 	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [cpassword, setcPassword] = useState("");
 	const [image, setImage] = useState(null);
+	const [image1, setImage1] = useState(null);
+
 	const [captured, setCaptured] = useState(false); // Track whether an image is captured
 	const videoRef = useRef(null);
 	const canvasRef = useRef(null);
@@ -281,18 +285,23 @@ const RegistrationForm = () => {
 		const video = videoRef.current;
 
 		if (video) {
+			const canvas1 = document.createElement("canvas");
 			const canvas = document.createElement("canvas");
+
 			const context = canvas.getContext("2d");
 
 			// Set canvas dimensions to match video stream
 			canvas.width = video.videoWidth;
 			canvas.height = video.videoHeight;
+			canvas1.width = 216;
+			canvas1.height = 216;
 
 			// Draw video frame onto the canvas
 			context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
 			// Convert canvas image to data URL
-			const dataURL = canvas.toDataURL("image/jpeg");
+			const dataURL = canvas.toDataURL("image/png");
+			const dataURL1 = canvas1.toDataURL("image/png");
 
 			// Create an HTMLImageElement from the data URL
 			const capturedImage = new Image();
@@ -301,6 +310,7 @@ const RegistrationForm = () => {
 			capturedImage.onload = async () => {
 				// Set the captured image as the selected image
 				setImage(dataURL);
+				setImage1(dataURL1);
 
 				// Update the captured state
 				setCaptured(true);
@@ -387,7 +397,7 @@ const RegistrationForm = () => {
 			username: username,
 			password: password,
 			email: email,
-			face: image,
+			face: image1,
 		});
 
 		let config = {
@@ -432,6 +442,14 @@ const RegistrationForm = () => {
 		// You can add your registration logic here
 	};
 
+	if (user) {
+		if (callback) {
+			return <Navigate to={callback} />;
+		}
+		return <Navigate to="/" />;
+	}
+
+	if(!user && ready)
 	return (
 		<div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
 			<Toaster position="top-right" reverseOrder={true} />

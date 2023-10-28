@@ -5,6 +5,7 @@ const UserSchema = new Schema(
     name: {
       type: String,
       required: false,
+      default:null,
     },
     email: {
       type: String,
@@ -22,6 +23,10 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+    face: {
+      type: String,
+      required: true,
+    },
     verified: {
       type: Boolean,
       required: true,
@@ -30,10 +35,12 @@ const UserSchema = new Schema(
     mobile: {
       type: Number,
       required: false,
+      default:null,
     },
     address: {
       type: String,
       required: false,
+      default:null,
     },
     deleted: {
       type: Boolean,

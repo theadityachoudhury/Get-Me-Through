@@ -1,5 +1,7 @@
 const events = require("../../models/events");
+const applied = require("../../models/applied");
 const { eventSchema, eventUpdateSchema } = require("../Validators/Events/validators");
+const { admin } = require("../../config/firebase");
 
 const addEvents = async (req, res, next) => {
     try {
@@ -29,7 +31,7 @@ const addEvents = async (req, res, next) => {
 
 const getEvents = async (req, res, next) => {
     try {
-        const event = await events.find().select('title description organizer date capacity').sort({ createdAt: -1 });;
+        const event = await events.find().select('title description organizer date capacity applied').sort({ createdAt: -1 });;
         if (!event) {
             return res.status(200).json([]);
         } else {
@@ -92,15 +94,142 @@ const updateEvent = async (req, res, next) => {
         await event.save();
         return res.status(200).json();
     } catch (e) {
+        console.log(e);
         return res.status(400).json();
 
     }
 }
+
+
+const isApplied = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const apply = await applied.findOne({ user: req._id, event: id });
+        if (apply) {
+            return res.status(200).json();
+        } else {
+            return res.status(404).json();
+        }
+    } catch (e) {
+        return res.status(400).json();
+    }
+};
+
+const apply = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const isApplied = await applied.findOne({ user: req._id, event: id });
+        if (isApplied) {
+            return res.status(404).json("Already Applied!!");
+        }
+
+        let event = await events.findById(id).select("applied capacity");
+        if (event.applied >= event.capacity) {
+            return res.status(400).json({ success: false, message: "No more room for registrations!!" });
+        }
+
+        const userApply = new applied({
+            user: req._id,
+            event: id
+        });
+        await userApply.save();
+
+        event = await events.findByIdAndUpdate(
+            { _id: id },
+            { $inc: { applied: 1 } });
+
+
+        try {
+            const firebaseRef = admin.database().ref('Students'); // Replace with your desired Firebase path
+
+            // Push the data to Firebase
+            await firebaseRef.push({
+                user: req._id,
+                event: id
+            });
+
+            res.status(201).json({ message: "Data saved to Firebase" });
+        } catch (error) {
+            res.status(500).json({ message: "Failed to save data to Firebase" });
+        }
+
+        return res.status(201).json();
+    } catch (e) {
+        console.log(e);
+        return res.status(400).json();
+    }
+};
+
+
+const markAttendance = async (req, res, next) => {
+    const { eventId, userId } = req.params;
+    if (!eventId || !userId) {
+        return res.status(404).json({ success: false, message: "Data incomplete", reason: "no-data" });
+    }
+    const attendee = await applied.findOne({ user: userId, event: eventId });
+    if (!attendee) {
+        return res.status(404).json({
+            success: false,
+            message: "No user registered for this event!!",
+            reason: "no-user"
+        });
+    }
+
+    attendee.attended = true;
+    await attendee.save();
+    return res.status(200).json({
+        success: true,
+        message: "Attendance Successful"
+    });
+}
+
+const userRegisteredEvents = async (req, res, next) => {
+    try {
+        const applications = await applied.find({ user: req._id });
+        const eventIds = applications.map((application) => application.event);
+        const registeredEvents = await events.find({ _id: { $in: eventIds } }).select("title description organizer date capacity");
+        if (!registeredEvents) {
+            return res.status(200).json([]);
+        } else {
+            return res.status(200).json(registeredEvents);
+        }
+    } catch (err) {
+        return res.status(500).json({
+            reason: "server",
+            message: "Unexpected Error Occurred!",
+            success: false,
+        })
+    }
+}
+const userAttendedEvents = async (req, res, next) => {
+    try {
+        const applications = await applied.find({ user: req._id, attended: true });
+        const eventIds = applications.map((application) => application.event);
+        const registeredEvents = await events.find({ _id: { $in: eventIds } }).select("title description organizer date capacity");
+        if (!registeredEvents) {
+            return res.status(200).json([]);
+        } else {
+            return res.status(200).json(registeredEvents);
+        }
+    } catch (err) {
+        return res.status(500).json({
+            reason: "server",
+            message: "Unexpected Error Occurred!",
+            success: false,
+        })
+    }
+}
+
 
 module.exports = {
     addEvents,
     getEvents,
     getEvent,
     updateEvent,
-    deleteEvent
+    deleteEvent,
+    isApplied,
+    apply,
+    markAttendance,
+    userRegisteredEvents,
+    userAttendedEvents,
 }

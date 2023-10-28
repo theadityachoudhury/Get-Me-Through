@@ -17,9 +17,15 @@ export default function Header() {
 
 	if (!user && ready) {
 		const callbackurl = window.location.pathname;
+		// console.log(callbackurl);
 		return <Navigate to={"/login?callback=" + callbackurl} />;
 	}
-	if (user && ready)
+	if (user && ready && !user.verified) {
+		const callbackurl = window.location.pathname;
+		// console.log(callbackurl);
+		return <Navigate to={"/verify?callback=" + callbackurl} />;
+	}
+	if (user && ready && user.verified)
 		return (
 			<>
 				<header className="flex justify-around bg-gray-100 mb-2">
@@ -92,7 +98,7 @@ export default function Header() {
 								</svg>
 							</div>
 
-							{!!user && <div>{user.email}</div>}
+							{!!user && <div>{user.name || user.email}</div>}
 						</Link>
 
 						{user && (
@@ -126,7 +132,6 @@ export default function Header() {
 							</div>
 						)}
 					</div>
-					
 				</header>
 				<hr className=" mb-5" />
 				<div className="">

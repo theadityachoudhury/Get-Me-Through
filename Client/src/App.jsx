@@ -13,7 +13,12 @@ import LoginForm from "./pages/login";
 import EventAddForm from "./pages/event/add";
 import EventPage from "./pages/event/event";
 import LoginForm2 from "./pages/login2";
-import Dashboard from "./pages/dashboard";
+import Dashboard from "./pages/Dashboard";
+import EventApplyPage from "./pages/event/apply";
+import ForgetPassPage from "./pages/ForgetPassPage";
+import EventAttendance from "./pages/event/mark";
+import AccountPage from "./pages/AccountPage";
+import Verify from "./pages/verify";
 
 // axios.defaults.baseURL = "http://localhost:5000";
 
@@ -36,14 +41,18 @@ function App() {
 					<Route path="/account/:subpage?" element={<AccountPage />} />
 					<Route path="/account/:subpage/:action" element={<AccountPage />} /> */}
 					<Route path="/events/add" element={<EventAddForm />} />
+					<Route path="/events/apply/:eventId" element={<EventApplyPage />} />
+					<Route path="/account/:subpage?" element={<AccountPage />} />
 					<Route path="/test" element={<Test />} />
+					<Route path="/events/mark" element={<EventAttendance />} />
 					<Route path="/events" element={<EventPage />} />
 					<Route path="/login2" element={<LoginForm />} />
-					<Route path="/dashboard" element={<Dashboard/>}/>
-					
+					<Route path="/" element={<Dashboard />} />
 				</Route>
 				<Route path="/login" element={<LoginForm2 />} />
 				<Route path="/register" element={<RegistrationForm />} />
+				<Route path="/forget/:subpage?" element={<ForgetPassPage />} />
+				<Route path="/verify" element={<Verify />} />
 
 				{/* <Route path="/login" element={<LoginPage />} />
 				<Route path="/forget/:subpage?" element={<ForgetPassPage />} /> */}

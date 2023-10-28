@@ -237,6 +237,7 @@ const EventAddForm = () => {
 									value={formData.registrationFee}
 									onChange={(e) => handleChange(e, "registrationFee")}
 									className="border border-gray-300 rounded px-2 py-1"
+									disabled
 								/>
 							</div>
 

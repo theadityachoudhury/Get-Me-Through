@@ -26,9 +26,9 @@ const EventModalView = ({ event, onClose, isOpen }) => {
 				<h2 className="text-center text-5xl font-bold m-5">Event Details</h2>
 
 				<div
-					className="modal-content-scrollable"
+					className="modal-content-scrollable custom-scroll overflow-y-scroll"
 					style={{ maxHeight: "500px", overflowY: "scroll" }}>
-					<form>
+					<form className="mr-4">
 						{/* Title */}
 						<div className="mb-4 flex items-center">
 							<label htmlFor="title" className="text-lg font-semibold w-1/3">

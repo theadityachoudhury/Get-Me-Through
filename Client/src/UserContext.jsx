@@ -22,7 +22,7 @@ export function UserContextProvider({ children }) {
 			})
 			.catch((error) => {
 				// Handle error, e.g., show error message or log the error
-				console.error(error);
+					console.error(error);
 				setReady(true);
 			});
 	};

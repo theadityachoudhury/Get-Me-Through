@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import Card from "./components/card";
-import { UserContext } from "./UserContext.jsx";
+import { UserContext } from "../UserContext";
 
 const Dashboard = () => {
 	const { ready, user } = useContext(UserContext);
