@@ -6,6 +6,7 @@ import { UserContext } from "../UserContext";
 import toast, { Toaster } from "react-hot-toast";
 import OTPInput from "./components/OTPInput";
 import "../App.css";
+import Loader from "./components/Loader";
 
 const Verify = () => {
 	const [params] = useSearchParams();
@@ -74,8 +75,8 @@ const Verify = () => {
 
 		try {
 			const response = await axios.request(config);
-            toast.success("Success: " + response.data.message);
-            toast.success("Login again to continue!!");
+			toast.success("Success: " + response.data.message);
+			toast.success("Login again to continue!!");
 			await delay(3000);
 			setUser(response.data.data);
 			setFormData({
@@ -90,6 +91,9 @@ const Verify = () => {
 			toast.error(errorData);
 		}
 	};
+	if (!ready) {
+		return <Loader />;
+	}
 
 	if (!user) {
 		if (callback) {
