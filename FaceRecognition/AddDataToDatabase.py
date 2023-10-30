@@ -14,46 +14,22 @@ data = {
     "2129013":
         {
             "name": "Adwaith PJ",
-            "major": "Computer science",
-            "section": "CSCE",
-            "branch": "BTech",
-            "starting_year": 2021,
             "total_attendance": 0,
-            "standing": "G",
-            "year": 4,
             "last_attendance_time": "2022-12-11 00:54:34"
         }, "2129011":
         {
             "name": "Aditya Choudhury",
-            "major": "Computer science",
-            "section": "CSCE",
-            "branch": "BTech",
-            "starting_year": 2021,
             "total_attendance": 0,
-            "standing": "G",
-            "year": 4,
             "last_attendance_time": "2022-12-11 00:54:34"
         }, "2129010":
         {
             "name": "Aditya Singh",
-            "major": "Computer science",
-            "section": "CSCE",
-            "branch": "BTech",
-            "starting_year": 2021,
             "total_attendance": 0,
-            "standing": "G",
-            "year": 4,
             "last_attendance_time": "2022-12-11 00:54:34"
         }, "21052062":
         {
             "name": "Ashutosh",
-            "major": "Computer science",
-            "section": "CSE",
-            "branch": "BTech",
-            "starting_year": 2021,
             "total_attendance": 0,
-            "standing": "G",
-            "year": 4,
             "last_attendance_time": "2022-12-11 00:54:34"
         }
 

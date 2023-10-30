@@ -10,6 +10,7 @@ from firebase_admin import db
 from firebase_admin import storage
 from datetime import datetime
 import subprocess
+import webbrowser
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred, {
@@ -18,8 +19,16 @@ firebase_admin.initialize_app(cred, {
 })
 
 # bucket = storage.bucket()   #bucket that will store the images that has been uploaded in the database
+def on_mouse_click(event, x, y, flags, param):
+    if event == cv2.EVENT_LBUTTONDOWN:
+        # Define the region where the link should be opened
+        if 912 < x < 964 and 62 < y < 76:  # Define your specific position here
+            url = "https://www.google.com"  # Replace with your desired URL
+            webbrowser.open_new_tab(url)
+
 
 subprocess.run(['python', 'EncodeGenerator.py'])
+subprocess.run(['python','AddDataToDatabase.py'])  # comment this out if the data is automatically added
 
 cap = cv2.VideoCapture(0)
 cap.set(3, 1280)
@@ -116,10 +125,10 @@ while True:
                     cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
         cv2.putText(imgBackground, str(studentIds[matchIndex]), (1112, 640),
                     cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
-        cv2.putText(imgBackground, str(studentInfo['section']), (1112, 675),
-                    cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
-        cv2.putText(imgBackground, str(studentInfo['branch']), (1112, 715),
-                    cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+        # cv2.putText(imgBackground, str(studentInfo['section']), (1112, 675),
+        #             cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+        # cv2.putText(imgBackground, str(studentInfo['branch']), (1112, 715),
+        #             cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
 
         counter += 1
 
@@ -131,7 +140,9 @@ while True:
             studentInfo = []
 
     cv2.imshow("face attendance", imgBackground)  # to output the camera!!
+    cv2.setMouseCallback("face attendance", on_mouse_click)
     cv2.waitKey(1)
 
 cap.release()
 cv2.destroyAllWindows()
+
