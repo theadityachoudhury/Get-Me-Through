@@ -9,6 +9,7 @@ from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import storage
 from datetime import datetime
+import subprocess
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred, {
@@ -17,6 +18,8 @@ firebase_admin.initialize_app(cred, {
 })
 
 # bucket = storage.bucket()   #bucket that will store the images that has been uploaded in the database
+
+subprocess.run(['python', 'EncodeGenerator.py'])
 
 cap = cv2.VideoCapture(0)
 cap.set(3, 1280)
