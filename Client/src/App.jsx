@@ -20,7 +20,7 @@ import Email from "./pages/email";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import Logout from "./pages/logout";
-import Dashboard from "./pages/Dashboard";
+import Intro from "./pages/intro";
 
 // axios.defaults.baseURL = "http://localhost:5000";
 
@@ -49,7 +49,7 @@ function App() {
 					<Route path="/events/mark" element={<EventAttendance />} />
 					<Route path="/events" element={<EventPage />} />
 					<Route path="/login2" element={<LoginForm />} />
-					<Route path="/" element={<Dashboard />} />
+					<Route path="/" element={<Intro />} />
 					<Route path="/emails" element={<Email />} />
 					<Route path="/about" element={<AboutUs />} />
 					<Route path="/contact" element={<ContactUs />} />
