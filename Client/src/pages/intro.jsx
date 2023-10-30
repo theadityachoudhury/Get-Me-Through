@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import Card from "./components/card";
+import Card from "./components/Card";
 import { UserContext } from "../UserContext";
 
 const Intro = () => {
@@ -46,15 +46,13 @@ const Intro = () => {
 
 					<Card
 						title={"Manage Users"}
-						description={"View and Manage all the users that are registered on this platform!!"}
+						description={
+							"View and Manage all the users that are registered on this platform!!"
+						}
 						link={"/manage/users"}
 					/>
 
-					<Card
-						title={""}
-						description={""}
-						link={""}
-					/>
+					<Card title={""} description={""} link={""} />
 				</div>
 			</>
 		);
