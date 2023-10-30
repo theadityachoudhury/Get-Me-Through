@@ -46,3 +46,7 @@ input::-webkit-inner-spin-button {
 	-webkit-appearance: none;
 	margin: 0;
 }
+
+.small-button {
+	padding: 5px 10px !important; /* You can adjust the padding to control the button size */
+}

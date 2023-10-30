@@ -19,6 +19,10 @@ import ForgetPassPage from "./pages/ForgetPassPage";
 import EventAttendance from "./pages/event/mark";
 import AccountPage from "./pages/AccountPage";
 import Verify from "./pages/verify";
+import Email from "./pages/email";
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
+import Logout from "./pages/logout";
 
 // axios.defaults.baseURL = "http://localhost:5000";
 
@@ -48,8 +52,12 @@ function App() {
 					<Route path="/events" element={<EventPage />} />
 					<Route path="/login2" element={<LoginForm />} />
 					<Route path="/" element={<Dashboard />} />
+					<Route path="/emails" element={<Email />} />
+					<Route path="/about" element={<AboutUs />} />
+					<Route path="/contact" element={<ContactUs />} />
 				</Route>
 				<Route path="/login" element={<LoginForm2 />} />
+				<Route path="/logout" element={<Logout />} />
 				<Route path="/register" element={<RegistrationForm />} />
 				<Route path="/forget/:subpage?" element={<ForgetPassPage />} />
 				<Route path="/verify" element={<Verify />} />
