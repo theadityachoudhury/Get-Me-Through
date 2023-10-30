@@ -1,22 +1,38 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+// import { defineConfig } from 'vite'
+// import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
+// // https://vitejs.dev/config/
+// // export default defineConfig({
+// //   plugins: [react()],
+// // })
+
 // export default defineConfig({
-//   plugins: [react()],
+//   plugins: [react({
+//     // Add this line
+//     include: "**/*.jsx",
+//   })],
+//   server: {
+//     watch: {
+//       usePolling: true
+//     }
+//   },
+//   build: {
+//     chunkSizeWarningLimit: 2000, // Set to 1 MB
+//   },
 // })
 
+
+
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react({
-    // Add this line
-    include: "**/*.jsx",
-  })],
+  plugins: [react()],
   server: {
-    watch: {
-      usePolling: true
-    }
+    port: 5173, // You can change the port as needed
   },
   build: {
-    chunkSizeWarningLimit: 2000, // Set to 1 MB
+    outDir: 'dist', // Output directory for production build
   },
-})
+});
