@@ -1,15 +1,26 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import "./App.css";
-import IndexPage from "./pages/IndexPage";
-import LoginPage from "./pages/LoginPage";
 
 import Layout from "./Layout";
-import RegistePage from "./pages/RegisterPage";
+import RegistrationForm from "./pages/register";
+import Test from "./pages/test";
 import axios from "axios";
 import { UserContextProvider } from "./UserContext";
-import AccountPage from "./pages/AccountPage";
+import LoginForm from "./pages/login";
+import EventAddForm from "./pages/event/add";
+import EventPage from "./pages/event/event";
+import LoginForm2 from "./pages/login2";
+import EventApplyPage from "./pages/event/apply";
 import ForgetPassPage from "./pages/ForgetPassPage";
+import EventAttendance from "./pages/event/mark";
+import AccountPage from "./pages/AccountPage";
+import Verify from "./pages/verify";
+import Email from "./pages/email";
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
+import Logout from "./pages/logout";
+import Intro from "./pages/intro";
 
 // axios.defaults.baseURL = "http://localhost:5000";
 
@@ -28,13 +39,30 @@ function App() {
 		<UserContextProvider>
 			<Routes>
 				<Route path="/" element={<Layout />}>
-					<Route index element={<IndexPage />} />
+					{/* <Route index element={<IndexPage />} />
 					<Route path="/account/:subpage?" element={<AccountPage />} />
-					<Route path="/account/:subpage/:action" element={<AccountPage />} />
+					<Route path="/account/:subpage/:action" element={<AccountPage />} /> */}
+					<Route index element={<Navigate to="/dashboard" replace />} />
+					<Route path="/events/add" element={<EventAddForm />} />
+					<Route path="/events/apply/:eventId" element={<EventApplyPage />} />
+					<Route path="/account/:subpage?" element={<AccountPage />} />
+					<Route path="/test" element={<Test />} />
+					<Route path="/events/mark" element={<EventAttendance />} />
+					<Route path="/events" element={<EventPage />} />
+					<Route path="/login2" element={<LoginForm />} />
+					<Route path="/dashboard" element={<Intro />} />
+					<Route path="/emails" element={<Email />} />
+					<Route path="/about" element={<AboutUs />} />
+					<Route path="/contact" element={<ContactUs />} />
 				</Route>
-				<Route path="/register" element={<RegistePage />} />
-				<Route path="/login" element={<LoginPage />} />
+				<Route path="/login" element={<LoginForm2 />} />
+				<Route path="/logout" element={<Logout />} />
+				<Route path="/register" element={<RegistrationForm />} />
 				<Route path="/forget/:subpage?" element={<ForgetPassPage />} />
+				<Route path="/verify" element={<Verify />} />
+
+				{/* <Route path="/login" element={<LoginPage />} />
+				<Route path="/forget/:subpage?" element={<ForgetPassPage />} /> */}
 			</Routes>
 		</UserContextProvider>
 	);

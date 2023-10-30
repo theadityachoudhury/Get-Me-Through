@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import Loader from "./Loader";
+import Loader from "./components/Loader";
 
 export default function ForgetPassPage() {
 	let { subpage } = useParams();
@@ -64,9 +64,7 @@ export default function ForgetPassPage() {
 	}
 
 	if (loading) {
-		return (
-			<Loader/>
-		)
+		return <Loader />;
 	}
 
 	if (subpage && !validLink) {
