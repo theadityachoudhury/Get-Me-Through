@@ -15,5 +15,8 @@ export default defineConfig({
     watch: {
       usePolling: true
     }
-  }
+  },
+  build: {
+    chunkSizeWarningLimit: 2000, // Set to 1 MB
+  },
 })
