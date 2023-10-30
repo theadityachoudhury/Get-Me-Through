@@ -8,6 +8,7 @@ const { initializeFirebase } = require("./config/firebase");
 const { DB, REQUEST_TIMEOUT, PORT } = require("./config/db");
 const auth = require("./routes/auth-routes");
 const event = require("./routes/events-routes");
+const email = require("./routes/email-routes");
 const User = require("./models/Users");
 
 const app = express();
@@ -40,6 +41,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", auth);
 app.use("/api/events", event);
+app.use("/api/email", email);
 
 app.get("/update-users", async (req, res) => {
     try {
