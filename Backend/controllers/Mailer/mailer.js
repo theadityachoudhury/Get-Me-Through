@@ -34,15 +34,21 @@ const mailer = async (to, subject, hbody, username, type) => {
 		},
 	});
 
+	if (!Array.isArray(to)) {
+		to = [to];
+	}
+
 	let message = {
 		from: '"Aditya Choudhury" <aditya@adityachoudhury.com>', // sender address
-		to: to, // list of receivers
+		to: to.join(', '), // List of receivers, join the array into a comma-separated string
 		subject: subject, // Subject line
 		html: hbody, // html body
 	};
 
-    let info = await transporter.sendMail(message);
-    save_message(username, to, subject, hbody, "success", type, info.messageId);
+	let info = await transporter.sendMail(message);
+	for (const recipient of to) {
+		save_message(username, recipient, subject, hbody, "success", type, info.messageId);
+	}
 	return;
 };
 
