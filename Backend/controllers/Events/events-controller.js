@@ -1,5 +1,6 @@
 const events = require("../../models/events");
 const applied = require("../../models/applied");
+const user = require("../../models/Users");
 const { eventSchema, eventUpdateSchema } = require("../Validators/Events/validators");
 const { admin } = require("../../config/firebase");
 
@@ -31,7 +32,7 @@ const addEvents = async (req, res, next) => {
 
 const getEvents = async (req, res, next) => {
     try {
-        const event = await events.find().select('title description organizer date capacity applied').sort({ createdAt: -1 });;
+        const event = await events.find().select('title description organizer date capacity applied').sort({ createdAt: -1 });
         if (!event) {
             return res.status(200).json([]);
         } else {
@@ -183,6 +184,29 @@ const markAttendance = async (req, res, next) => {
     });
 }
 
+const registeredUsers = async (req, res, next) => {
+    const { eventId } = req.params;
+    try {
+        const regs = await applied.find({ event: eventId });
+        const userIds = regs.map((reg) => reg.user);
+        const regUsers = await user.find({ _id: { $in: userIds } }).select("username email");
+        if (!regUsers) {
+            return res.status(200).json([]);
+        } else {
+            return res.status(200).json(regUsers);
+        }
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            reason: "server",
+            message: "Unexpected Error Occurred!",
+            success: false,
+            data: err,
+        });
+    }
+
+}
+
 const userRegisteredEvents = async (req, res, next) => {
     try {
         const applications = await applied.find({ user: req._id });
@@ -198,7 +222,7 @@ const userRegisteredEvents = async (req, res, next) => {
             reason: "server",
             message: "Unexpected Error Occurred!",
             success: false,
-        })
+        });
     }
 }
 const userAttendedEvents = async (req, res, next) => {
@@ -232,4 +256,5 @@ module.exports = {
     markAttendance,
     userRegisteredEvents,
     userAttendedEvents,
+    registeredUsers,
 }

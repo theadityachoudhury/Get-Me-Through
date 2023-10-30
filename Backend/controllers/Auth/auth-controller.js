@@ -137,7 +137,7 @@ const register = async (req, res, next) => {
             success: true,
         });
 
-        mailer(signupRequest.email, "Account Created | Get-Me-Through", `Your Account has been created in the Get-Me-Through portal.<br>To verify your account click on the link:- <a href="https://localhost:5173/verify" target="_blank">https://localhost:5173/verify</a>`, signupRequest.username, "acc_creation");
+        mailer(signupRequest.email, "Account Created | Get-Me-Through", `Your Account has been created in the Get-Me-Through portal.<br>To verify your account click on the link:- <a href="http://localhost:5173/verify" target="_blank">https://localhost:5173/verify</a>`, signupRequest.username, "acc_creation");
 
         return;
     } catch (e) {
