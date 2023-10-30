@@ -15,16 +15,16 @@ export default function Header() {
 		return <Loader />;
 	}
 
-	if (!user && ready) {
-		const callbackurl = window.location.pathname;
-		// console.log(callbackurl);
-		return <Navigate to={"/login?callback=" + callbackurl} />;
-	}
-	if (user && ready && !user.verified) {
-		const callbackurl = window.location.pathname;
-		// console.log(callbackurl);
-		return <Navigate to={"/verify?callback=" + callbackurl} />;
-	}
+	// if (!user && ready) {
+	// 	const callbackurl = window.location.pathname;
+	// 	// console.log(callbackurl);
+	// 	return <Navigate to={"/login?callback=" + callbackurl} />;
+	// }
+	// if (user && ready && !user.verified) {
+	// 	const callbackurl = window.location.pathname;
+	// 	// console.log(callbackurl);
+	// 	return <Navigate to={"/verify?callback=" + callbackurl} />;
+	// }
 	if (user && ready && user.verified)
 		return (
 			<>
@@ -64,6 +64,16 @@ export default function Header() {
 								<span className="">About Us</span>
 							</Link>
 						</div>
+						{user.role === "admin" && (
+							<>
+								<div className="border-l border-gray-300"></div>
+								<div>
+									<Link to={"/emails"} className="flex items-center gap-1">
+										<span className="">Email Logs</span>
+									</Link>
+								</div>
+							</>
+						)}
 					</div>
 
 					<div className="flex gap-2 rounded-full">
@@ -129,6 +139,11 @@ export default function Header() {
 									}}>
 									Logout
 								</button>
+								{/* <Link to={"/logout"}>
+									<button className="rounded-full bg-black hover:bg-gray-700 ">
+										Logout
+									</button>
+								</Link> */}
 							</div>
 						)}
 					</div>
