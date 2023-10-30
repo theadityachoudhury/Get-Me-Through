@@ -29,7 +29,7 @@ export default function Header() {
 		return (
 			<>
 				<header className="flex justify-around bg-gray-100 mb-2">
-					<Link to={"/"} className="flex items-center gap-1">
+					<Link to={"/dashboard"} className="flex items-center gap-1">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							fill="none"

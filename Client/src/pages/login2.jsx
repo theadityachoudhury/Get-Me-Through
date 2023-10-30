@@ -8,6 +8,7 @@ import toast, { Toaster } from "react-hot-toast";
 const LoginForm2 = () => {
 	const [params] = useSearchParams();
 	const callback = params.get("callback");
+	if (callback == "/") return <Navigate to="/dashboard" />;
 
 	const { setUser, user, ready } = useContext(UserContext);
 	const [redirect, setRedirect] = useState(false);
@@ -71,7 +72,7 @@ const LoginForm2 = () => {
 		if (callback) {
 			return <Navigate to={callback} />;
 		}
-		return <Navigate to="/" />;
+		return <Navigate to="/dashboard" />;
 	}
 
 	if (!user && ready)
