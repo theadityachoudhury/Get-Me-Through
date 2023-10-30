@@ -1,8 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 
 import "./App.css";
-// import IndexPage from "./pages/IndexPage";
-// import LoginPage from "./pages/LoginPage";
 
 import Layout from "./Layout";
 import RegistrationForm from "./pages/register";
@@ -13,7 +11,6 @@ import LoginForm from "./pages/login";
 import EventAddForm from "./pages/event/add";
 import EventPage from "./pages/event/event";
 import LoginForm2 from "./pages/login2";
-import Dashboard from "./pages/Dashboard";
 import EventApplyPage from "./pages/event/apply";
 import ForgetPassPage from "./pages/ForgetPassPage";
 import EventAttendance from "./pages/event/mark";
@@ -23,6 +20,7 @@ import Email from "./pages/email";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import Logout from "./pages/logout";
+import Dashboard from "./pages/Dashboard";
 
 // axios.defaults.baseURL = "http://localhost:5000";
 
