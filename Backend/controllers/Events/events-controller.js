@@ -216,19 +216,19 @@ const getApplications = async (req, res, next) => {
 }
 
 const mark = async (req, res, next) => {
-    console.log(req.body, req.body.users);
-    const users = req.body;
+    console.log(req.body.users);
+    const { users } = req.body;
+    const { eventId } = req.params;
 
     try {
         for (const updatedAttendance of users) {
-            const { user, event, attended } = updatedAttendance;
-            await Application.findOneAndUpdate(
-                { user, event },
-                { attended },
-                { upsert: true }
+            const attended = updatedAttendance.attended;
+            const user = updatedAttendance.user._id;
+            await applied.findOneAndUpdate(
+                { user: user, event: eventId },
+                { attended: attended }
             );
         }
-
         res.status(200).json();
     } catch (err) {
         res.status(500).json();
