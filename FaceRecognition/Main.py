@@ -1,4 +1,5 @@
 import os
+import sys
 import pickle
 import numpy as np
 import cv2
@@ -11,12 +12,19 @@ from firebase_admin import storage
 from datetime import datetime
 import subprocess
 import webbrowser
+import requests
+from InputBox import RequestCaller
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred, {
     'databaseURL': " https://faceattendancerealtime-a8bc3-default-rtdb.firebaseio.com/",
     'storageBucket': "faceattendancerealtime-a8bc3.appspot.com"
 })
+# Event ID input Below
+input_req = RequestCaller()
+input_req.mainloop()
+req_val = input_req.x1
+
 
 # bucket = storage.bucket()   #bucket that will store the images that has been uploaded in the database
 def on_mouse_click(event, x, y, flags, param):
@@ -25,10 +33,14 @@ def on_mouse_click(event, x, y, flags, param):
         if 912 < x < 964 and 62 < y < 76:  # Define your specific position here
             url = "https://www.google.com"  # Replace with your desired URL
             webbrowser.open_new_tab(url)
+        if 633 < x < 808 and 820 < y < 885:
+            cv2.destroyAllWindows()
+            sys.exit(0)
 
 
-subprocess.run(['python', 'EncodeGenerator.py'])
-subprocess.run(['python','AddDataToDatabase.py'])  # comment this out if the data is automatically added
+#
+# subprocess.run(['python', 'EncodeGenerator.py'])
+# subprocess.run(['python','AddDataToDatabase.py'])  # comment this out if the data is automatically added
 
 cap = cv2.VideoCapture(0)
 cap.set(3, 1280)
@@ -49,7 +61,7 @@ file = open('EncodeGenerator.p', 'rb')
 encodeListKnownwithIds = pickle.load(file)
 file.close()
 encodeListKnown, studentIds = encodeListKnownwithIds
-# print(studentIds)
+print(studentIds)
 print("Encoded file loaded")  # printing the status of load
 
 modeType = 3
@@ -59,6 +71,20 @@ id = -1
 
 while True:
     success, img = cap.read()  # cap.read() reads the files, if it is an image, then it will read the vectors
+
+    #changes to improve camera perfomance
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    brightness = 50
+    contrast = 30
+    img = np.int16(img)
+    img = img * (contrast / 127 + 1) - contrast + brightness
+    img = np.clip(img, 0, 255)
+    img = np.uint8(img)
+
+    # Frame Processing
+    img = cv2.GaussianBlur(img, (5, 5), 0)  # Apply Gaussian Blur for noise reduction
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+
 
     img_resized = cv2.resize(img, (765, 396), None, 0.25,
                              0.25)  # resize() function is used to resize the camera output to specifed length
@@ -103,7 +129,9 @@ while True:
         if counter == 1:
             # get the data
             studentInfo = db.reference(f'Students/{id}').get()
+            UserInfo = db.reference(f'Users/{id}').get()
             print(studentInfo)
+            print(UserInfo)
             # get the image
             # blob = bucket.get_blob(f'Images/{id}').get()
             # array = np.frombuffer(blob.download_as_string(), np.uint8)  #creating an array to store the download image
@@ -115,26 +143,41 @@ while True:
                                                "%Y-%m-%d %H:%M:%S")
             secondsElapsed = (datetime.now() - datatimeObject).total_seconds()
             print(secondsElapsed)
-            if secondsElapsed > 60:
+            if secondsElapsed > 30:
                 ref = db.reference(f'Students/{id}')
                 studentInfo['total_attendance'] += 1
                 ref.child('total_attendance').set(studentInfo['total_attendance'])
                 ref.child('last_attendance_time').set(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            else:
+                modeType = 2
+                counter = 10
+                imgBackground[354:354 + 395, 958:958 + 398] = imgModeList[modeType]
 
-        cv2.putText(imgBackground, str(studentInfo['name']), (1112, 604),
-                    cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
-        cv2.putText(imgBackground, str(studentIds[matchIndex]), (1112, 640),
-                    cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
-        # cv2.putText(imgBackground, str(studentInfo['section']), (1112, 675),
-        #             cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
-        # cv2.putText(imgBackground, str(studentInfo['branch']), (1112, 715),
-        #             cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+        if  20 < counter < 30 :
+            modeType = 3
+
+        imgBackground[354:354 + 395, 958:958 + 398] = imgModeList[modeType]
+
+        if counter < 10:
+            cv2.putText(imgBackground, str(studentInfo["name"]), (1112, 604),
+                            cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+            cv2.putText(imgBackground, str(studentIds[matchIndex]), (1112, 640),
+                        cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+                # cv2.putText(imgBackground, str(studentInfo['section']), (1112, 675),
+                #             cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+                # cv2.putText(imgBackground, str(studentInfo['branch']), (1112, 715),
+                #             cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+
+        # if time.time() - start_time >= display_duration:
+        #     counter = 0
+        #     modeType = 3
+        #     studentInfo = []
 
         counter += 1
 
         # if studentInfo['total_attendance'] > 1:
 
-        if counter > 10:
+        if counter > 20:
             counter = 0
             modeType = 3
             studentInfo = []
