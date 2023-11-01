@@ -21,6 +21,7 @@ import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import Logout from "./pages/logout";
 import Intro from "./pages/intro";
+import NotFound404 from "./pages/components/NotFound/NotFound404";
 
 // axios.defaults.baseURL = "http://localhost:5000";
 
@@ -47,7 +48,11 @@ function App() {
 					<Route path="/events/apply/:eventId" element={<EventApplyPage />} />
 					<Route path="/account/:subpage?" element={<AccountPage />} />
 					<Route path="/test" element={<Test />} />
-					<Route path="/events/mark" element={<EventAttendance />} />
+					<Route
+						path="/events/mark/:eventId"
+						element={<EventAttendance />}
+						exact
+					/>
 					<Route path="/events" element={<EventPage />} />
 					<Route path="/login2" element={<LoginForm />} />
 					<Route path="/dashboard" element={<Intro />} />
@@ -60,6 +65,7 @@ function App() {
 				<Route path="/register" element={<RegistrationForm />} />
 				<Route path="/forget/:subpage?" element={<ForgetPassPage />} />
 				<Route path="/verify" element={<Verify />} />
+				<Route path="*" element={<NotFound404 />} />
 
 				{/* <Route path="/login" element={<LoginPage />} />
 				<Route path="/forget/:subpage?" element={<ForgetPassPage />} /> */}
