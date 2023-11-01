@@ -172,7 +172,16 @@ const markAttendance = async (req, res, next) => {
     if (!eventId || !userId) {
         return res.status(404).json({ success: false, message: "Data incomplete", reason: "no-data" });
     }
-    const attendee = await applied.findOne({ user: userId, event: eventId });
+    const User = await user.findOne({ username: userId }).select('username');
+    if (!User) {
+        return res.status(404).json({
+            success: false,
+            message: "No user registered for this event!!",
+            reason: "no-user"
+        });
+    }
+    // console.log(U)
+    const attendee = await applied.findOne({ user: User._id, event: eventId });
     if (!attendee) {
         return res.status(404).json({
             success: false,
