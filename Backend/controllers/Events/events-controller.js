@@ -144,10 +144,15 @@ const apply = async (req, res, next) => {
             const firebaseRef = admin.database().ref('Students'); // Replace with your desired Firebase path
 
             // Push the data to Firebase
-            await firebaseRef.push({
+            // await firebaseRef.push({
+            //     user: req._id,
+            //     event: id
+            // });
+
+            await firebaseRef.child(req.username).set({
                 user: req._id,
                 event: id
-            });
+            })
 
             res.status(201).json({ message: "Data saved to Firebase" });
         } catch (error) {

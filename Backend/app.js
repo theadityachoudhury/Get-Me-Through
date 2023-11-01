@@ -14,9 +14,9 @@ const User = require("./models/Users");
 const app = express();
 
 //Configurations
-app.use(cors({ credentials: true, origin: ['http://localhost:5173'] }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors({ credentials: true, origin: ['http://localhost:5173', "https://f.adityachoudhury.com"] }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 
 //App routes starts here

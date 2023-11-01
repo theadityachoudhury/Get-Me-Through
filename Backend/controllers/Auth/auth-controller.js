@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const fs = require('fs');
 
 const { JWT_SECRET, JWT_REFRESH_TOKEN_SECRET } = require("../../config/db");
 const { signupSchema, validateEmail, validateUsername, loginSchema, PasswordSchema } = require("../Validators/Auth/validators");
@@ -8,6 +9,7 @@ const Users = require("../../models/Users");
 const RefreshToken = require("../../models/refreshToken");
 const Auth = require("../../models/auth");
 const { mailer } = require("../Mailer/mailer");
+const { admin } = require("../../config/firebase");
 
 
 const Login_MSG = {
@@ -106,6 +108,120 @@ function hashString(string) {
 
 
 //Public API functions starts here
+// const register = async (req, res, next) => {
+//     try {
+//         const signupRequest = await signupSchema.validateAsync(req.body);
+//         let emailNotTaken = await validateEmail(signupRequest.email);
+//         if (!emailNotTaken) {
+//             return res.status(400).json({
+//                 message: Register_MSG.emailExists,
+//                 success: false,
+//             });
+//         }
+//         let usernameNotTaken = await validateUsername(signupRequest.username);
+//         if (!usernameNotTaken) {
+//             return res.status(400).json({
+//                 message: Register_MSG.usernameExists,
+//                 success: false,
+//             });
+//         }
+
+//         const password = await bcrypt.hash(signupRequest.password, 12);
+//         const newUser = new Users({
+//             ...signupRequest,
+//             password: password,
+//         });
+
+
+//         // const base64Data = req.body.face;
+//         // const imageBuffer = Buffer.from(base64Data.split(',')[1], 'base64');
+//         // const fileName = "Images/" + signupRequest.username + '.png';
+
+//         // const bucket = admin.storage().bucket();
+//         // const file = bucket.file(fileName);
+//         // const fileStream = file.createWriteStream({
+//         //     metadata: {
+//         //         contentType: 'image/png', // Set the content type of your image
+//         //     },
+//         // });
+
+//         // fileStream.end(imageBuffer);
+
+//         // fileStream.on('finish', () => {
+//         //     console.log('Image uploaded to Firebase Storage.');
+//         // }).on('error', (error) => {
+//         //     console.error('Error uploading image:', error);
+//         //     return res.status(500).json({
+//         //         message: Register_MSG.signupError,
+//         //         success: false,
+//         //     });
+//         // });
+
+//         // fileStream.on('error', (err) => {
+//         //     console.error('Error uploading image:', err);
+//         //     res.status(500).json({ error: 'Failed to upload image' });
+//         // });
+
+//         // fileStream.on('finish', () => {
+//         //     console.log('Image uploaded successfully.');
+//         // });
+
+//         var base64EncodedImageString = req.body.face,
+//             mimeType = 'image/png',
+//             fileName = signupRequest.username+".png",
+//             imageBuffer = new Buffer(base64EncodedImageString.split(',')[1], 'base64');
+
+//         var bucket = admin.storage().bucket();
+
+//         // Upload the image to the bucket
+//         var file = bucket.file('profile-images/' + fileName);
+//         file.save(imageBuffer, {
+//             metadata: { contentType: mimeType },
+//         }, ((error) => {
+
+//             if (error) {
+//                 return res.status(500).send('Unable to upload the image.');
+//             }
+//             // return res.status(200).send('Uploaded');
+//         }));
+
+//         const firebaseRef = admin.database().ref('Users'); // Replace with your desired Firebase path
+
+//         // Push the data to Firebase
+//         // await firebaseRef.push({
+//         //     user: req._id,
+//         //     event: id
+//         // });
+
+//         await firebaseRef.child(signupRequest.username).set({ ...signupRequest });
+
+//         await newUser.save({ writeConcern: { w: 'majority' } });
+
+//         res.status(201).json({
+//             message: Register_MSG.signupSuccess,
+//             success: true,
+//         });
+
+
+
+//         mailer(signupRequest.email, "Account Created | Get-Me-Through", `Your Account has been created in the Get-Me-Through portal.<br>To verify your account click on the link:- <a href="http://localhost:5173/verify" target="_blank">https://localhost:5173/verify</a>`, signupRequest.username, "acc_creation");
+
+//         return;
+//     } catch (e) {
+//         console.log(e);
+//         let errMsg = Register_MSG.signupError;
+//         if (e.isJoi === true) {
+//             e.status = 403;
+//             errMsg = e.message;
+//         }
+
+//         return res.status(e.status || 500).json({
+//             message: errMsg,
+//             success: false,
+//         });
+//     }
+// };
+
 const register = async (req, res, next) => {
     try {
         const signupRequest = await signupSchema.validateAsync(req.body);
@@ -136,12 +252,38 @@ const register = async (req, res, next) => {
             message: Register_MSG.signupSuccess,
             success: true,
         });
+        var base64EncodedImageString = req.body.face,
+            mimeType = 'image/png',
+            fileName = signupRequest.username + ".png",
+            imageBuffer = Buffer.from(base64EncodedImageString.split(',')[1], 'base64');
+
+        // Save the image to a local asset folder
+        const assetPath = 'assets/' + fileName; // Define your asset folder path
+        fs.writeFileSync(assetPath, imageBuffer);
+
+        var bucket = admin.storage().bucket();
+
+        // Upload the image to the Firebase Storage
+        var file = bucket.file('Images/' + fileName);
+        file.save(imageBuffer, {
+            metadata: { contentType: mimeType },
+        }, (error) => {
+            if (error) {
+                // return res.status(500).send('Unable to upload the image.');
+            }
+
+            // Delete the locally stored image after successful upload
+            fs.unlinkSync(assetPath);
+
+            const firebaseRef = admin.database().ref('Users'); // Replace with your desired Firebase path
+            firebaseRef.child(signupRequest.username).set({ ...signupRequest });
+
+
+        });
 
         mailer(signupRequest.email, "Account Created | Get-Me-Through", `Your Account has been created in the Get-Me-Through portal.<br>To verify your account click on the link:- <a href="http://localhost:5173/verify" target="_blank">https://localhost:5173/verify</a>`, signupRequest.username, "acc_creation");
-
-        return;
     } catch (e) {
-        // console.log(e);
+        console.log(e);
         let errMsg = Register_MSG.signupError;
         if (e.isJoi === true) {
             e.status = 403;
@@ -154,6 +296,7 @@ const register = async (req, res, next) => {
         });
     }
 };
+
 
 const login = async (req, res, next) => {
     try {
