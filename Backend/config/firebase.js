@@ -17,7 +17,8 @@ const initializeFirebase = () => {
     if (!admin.apps.length) {
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
-            databaseURL: "https://faceattendancerealtime-a8bc3-default-rtdb.firebaseio.com/" // Replace with your Firebase Realtime Database URL
+            databaseURL: "https://faceattendancerealtime-a8bc3-default-rtdb.firebaseio.com/", // Replace with your Firebase Realtime Database URL
+            storageBucket: "faceattendancerealtime-a8bc3.appspot.com"
         });
     }
 };

@@ -397,7 +397,7 @@ const RegistrationForm = () => {
 			username: username,
 			password: password,
 			email: email,
-			face: image1,
+			face: image,
 		});
 
 		let config = {
@@ -463,7 +463,7 @@ const RegistrationForm = () => {
 							Username:
 						</label>
 						<input
-							type="text"
+							type="Number"
 							id="username"
 							value={username}
 							onChange={handleUsernameChange}
