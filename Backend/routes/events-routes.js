@@ -1,7 +1,7 @@
 const express = require("express");
 const { verifytoken } = require("../controllers/Auth/auth-controller");
 const { isAdmin } = require("../controllers/Validators/Auth/validators");
-const { addEvents, getEvents, getEvent, updateEvent, deleteEvent, isApplied, apply, markAttendance, userRegisteredEvents, userAttendedEvents, registeredUsers } = require("../controllers/Events/events-controller");
+const { addEvents, getEvents, getEvent, updateEvent, deleteEvent, isApplied, apply, markAttendance, userRegisteredEvents, userAttendedEvents, registeredUsers, getApplications, mark } = require("../controllers/Events/events-controller");
 
 const router = express.Router();
 
@@ -16,5 +16,8 @@ router.post("/mark/:eventId/:userId", markAttendance);
 router.post("/reg", verifytoken, userRegisteredEvents);
 router.post("/attended", verifytoken, userAttendedEvents);
 router.get("/mark/reg/:eventId", verifytoken, isAdmin, registeredUsers);
+router.get("/regApplicants/:eventId", getApplications);
+router.post("/mark/:eventId", verifytoken, mark);
+
 
 module.exports = router;

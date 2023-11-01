@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const applicationSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'users', // Reference to the User model
+    ref: 'Users', // Reference to the User model
     required: true,
   },
   event: {

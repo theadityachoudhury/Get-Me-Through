@@ -189,6 +189,43 @@ const markAttendance = async (req, res, next) => {
     });
 }
 
+const getApplications = async (req, res, next) => {
+    const { eventId } = req.params;
+    try {
+        const applications = await applied.find({ event: eventId }, 'user attended').populate('user', 'username');
+        return res.status(200).json(applications);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            reason: "server",
+            message: "Unexpected Error Occurred!",
+            success: false,
+            data: err,
+        });
+    }
+
+}
+
+const mark = async (req, res, next) => {
+    console.log(req.body, req.body.users);
+    const users = req.body;
+
+    try {
+        for (const updatedAttendance of users) {
+            const { user, event, attended } = updatedAttendance;
+            await Application.findOneAndUpdate(
+                { user, event },
+                { attended },
+                { upsert: true }
+            );
+        }
+
+        res.status(200).json();
+    } catch (err) {
+        res.status(500).json();
+    }
+}
+
 const registeredUsers = async (req, res, next) => {
     const { eventId } = req.params;
     try {
@@ -262,4 +299,6 @@ module.exports = {
     userRegisteredEvents,
     userAttendedEvents,
     registeredUsers,
+    getApplications,
+    mark,
 }

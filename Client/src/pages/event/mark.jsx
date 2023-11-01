@@ -1,49 +1,85 @@
-// src/EventAttendance.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const EventAttendance = () => {
-	const [users, setUsers] = useState([
-		{ id: 1, name: "User 1", attended: false },
-		{ id: 2, name: "User 2", attended: false },
-		// Add more users here...
-	]);
+	const [users, setUsers] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const { eventId } = useParams();
+
+	useEffect(() => {
+		// Simulate fetching data from the API
+		axios
+			.get(`/api/events/regApplicants/${eventId}`)
+			.then((response) => {
+				setUsers(response.data);
+				setLoading(false);
+			})
+			.catch((error) => {
+				toast.error("Error fetching attendance data:", error);
+				setLoading(false);
+			});
+	}, [eventId]);
 
 	const handleCheckboxChange = (userId) => {
-		setUsers((prevUsers) =>
-			prevUsers.map((user) =>
-				user.id === userId ? { ...user, attended: !user.attended } : user
-			)
+		// Update the local state
+		const updatedUsers = users.map((user) =>
+			user.user._id === userId
+				? { ...user, attended: !user.attended } // Invert the value here
+				: user
 		);
-		console.log(users);
+		setUsers(updatedUsers);
 	};
+	// console.log(users);
 
 	const handleSaveAttendance = () => {
-		// Send the updated attendance data to the backend API
-		const updatedUsers = users.filter((user) => user.attended);
-		console.log(updatedUsers);
-		// You can make an API call here to send the data to the server
-		console.log("Updated Attendance Data:", updatedUsers);
+		// Send all user data to the backend
+		axios
+			.post(`/api/events/mark/${eventId}`, users)
+			.then((response) => {
+				toast.success("Attendance data updated successfully:");
+			})
+			.catch((error) => {
+				toast.error("Error updating attendance data!!");
+			});
 	};
 
 	return (
 		<div className="container mx-auto mt-8">
 			<h1 className="text-3xl font-semibold mb-4">Event Attendance</h1>
-			<div className="space-y-4">
-				{users.map((user) => (
-					<div key={user.id} className="flex items-center">
-						<input
-							type="checkbox"
-							checked={user.attended}
-							onChange={() => handleCheckboxChange(user.id)}
-							className="mr-2"
-						/>
-						<span>{user.name}</span>
-					</div>
-				))}
-			</div>
+			{loading ? (
+				<p>Loading attendance data...</p>
+			) : (
+				<div className="overflow-x-auto">
+					<table className="min-w-full border rounded-lg">
+						<thead>
+							<tr className="bg-gray-200">
+								<th className="border p-2">Username</th>
+								<th className="border p-2">Attended</th>
+							</tr>
+						</thead>
+						<tbody>
+							{users.map((user) => (
+								<tr key={user._id} className="text-center">
+									<td className="border p-2">{user.user.username}</td>
+									<td className="border p-2">
+										<input
+											type="checkbox"
+											checked={user.attended}
+											onChange={() => handleCheckboxChange(user.user._id)}
+											className="mx-auto h-6 w-6 rounded-full text-blue-500 border border-blue-500 shadow"
+										/>
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			)}
 			<button
 				onClick={handleSaveAttendance}
-				className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+				className="mt-4 bg-blue-500 hover-bg-blue-600 text-white font-semibold py-2 px-4 rounded">
 				Save Attendance
 			</button>
 		</div>
