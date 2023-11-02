@@ -39,8 +39,8 @@ def on_mouse_click(event, x, y, flags, param):
 
 
 #
-# subprocess.run(['python', 'EncodeGenerator.py'])
-# subprocess.run(['python','AddDataToDatabase.py'])  # comment this out if the data is automatically added
+subprocess.run(['python', 'EncodeGenerator.py'])
+subprocess.run(['python','AddDataToDatabase.py'])  # comment this out if the data is automatically added
 
 cap = cv2.VideoCapture(0)
 cap.set(3, 1280)
@@ -72,7 +72,7 @@ id = -1
 while True:
     success, img = cap.read()  # cap.read() reads the files, if it is an image, then it will read the vectors
 
-    #changes to improve camera perfomance
+    # changes to improve camera perfomance
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     brightness = 50
     contrast = 30
@@ -81,10 +81,9 @@ while True:
     img = np.clip(img, 0, 255)
     img = np.uint8(img)
 
-    # Frame Processing
+    #     Frame Processing
     img = cv2.GaussianBlur(img, (5, 5), 0)  # Apply Gaussian Blur for noise reduction
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-
 
     img_resized = cv2.resize(img, (765, 396), None, 0.25,
                              0.25)  # resize() function is used to resize the camera output to specifed length
@@ -129,9 +128,9 @@ while True:
         if counter == 1:
             # get the data
             studentInfo = db.reference(f'Students/{id}').get()
-            UserInfo = db.reference(f'Users/{id}').get()
+            # UserInfo = db.reference(f'Users/{id}').get()
             print(studentInfo)
-            print(UserInfo)
+#             print(UserInfo["username"])
             # get the image
             # blob = bucket.get_blob(f'Images/{id}').get()
             # array = np.frombuffer(blob.download_as_string(), np.uint8)  #creating an array to store the download image
@@ -139,8 +138,7 @@ while True:
             # not implementing "showing image" here!!
 
             # update data of attendance in firebase
-            datatimeObject = datetime.strptime(studentInfo["last_attendance_time"],
-                                               "%Y-%m-%d %H:%M:%S")
+            datatimeObject = datetime.strptime(studentInfo["last_attendance_time"],"%Y-%m-%d %H:%M:%S")
             secondsElapsed = (datetime.now() - datatimeObject).total_seconds()
             print(secondsElapsed)
             if secondsElapsed > 30:
@@ -148,25 +146,39 @@ while True:
                 studentInfo['total_attendance'] += 1
                 ref.child('total_attendance').set(studentInfo['total_attendance'])
                 ref.child('last_attendance_time').set(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+                # request going to backend.
+                url = f"https://coral-app-xybu6.ondigitalocean.app/api/events/mark/{req_val}/{id}"
+
+                # Make a POST request
+                response = requests.post(url)
+
+                # Check the response
+                if response.status_code == 200:
+                    print("Request was successful")
+                else:
+                    print("Request failed")
+
+
             else:
                 modeType = 2
                 counter = 10
                 imgBackground[354:354 + 395, 958:958 + 398] = imgModeList[modeType]
 
-        if  20 < counter < 30 :
+        if 20 < counter < 30:
             modeType = 3
 
         imgBackground[354:354 + 395, 958:958 + 398] = imgModeList[modeType]
 
         if counter < 10:
             cv2.putText(imgBackground, str(studentInfo["name"]), (1112, 604),
-                            cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+                        cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
             cv2.putText(imgBackground, str(studentIds[matchIndex]), (1112, 640),
                         cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
-                # cv2.putText(imgBackground, str(studentInfo['section']), (1112, 675),
-                #             cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
-                # cv2.putText(imgBackground, str(studentInfo['branch']), (1112, 715),
-                #             cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+            # cv2.putText(imgBackground, str(studentInfo['section']), (1112, 675),
+            #             cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+            # cv2.putText(imgBackground, str(studentInfo['branch']), (1112, 715),
+            #             cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
 
         # if time.time() - start_time >= display_duration:
         #     counter = 0
@@ -188,4 +200,3 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
-
