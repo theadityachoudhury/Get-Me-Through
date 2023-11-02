@@ -371,8 +371,17 @@ const login = async (req, res, next) => {
                     });
             }
 
-            res.cookie("token", token);
-            res.cookie("refreshToken", refreshToken);
+            res.cookie("token", token, {
+                path: "/",
+                expires: new Date(Date.now() + 1000 * 10 * 60),
+                httpOnly: true,
+                sameSite: "lax",
+            });
+            res.cookie("refreshToken", refreshToken, {
+                path: "/",
+                httpOnly: true,
+                sameSite: "lax",
+            });
 
             let result = {
                 token: token,
@@ -525,6 +534,7 @@ const logout = async (req, res, next) => {
 
     res.clearCookie("token");
     res.clearCookie("refreshToken");
+
 
     if (!token) {
         return res.status(200).json(null);

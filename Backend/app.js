@@ -20,6 +20,11 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 
 //App routes starts here
+
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Credentials", true);
+    next();
+})
 app.get("/", async (req, res) => {
     res.send({
         data: {
