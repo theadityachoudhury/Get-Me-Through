@@ -18,7 +18,7 @@ data = {
             "last_attendance_time": "2022-12-11 00:54:34"
         }, "2129011":
         {
-            "name": "Aditya Choudhury",
+            "name": "Aditya Choudh",
             "total_attendance": 0,
             "last_attendance_time": "2022-12-11 00:54:34"
         }, "2129010":
