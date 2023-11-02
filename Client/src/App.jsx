@@ -23,7 +23,7 @@ import Logout from "./pages/logout";
 import Intro from "./pages/intro";
 import NotFound404 from "./pages/components/NotFound/NotFound404";
 
-// axios.defaults.baseURL = "http://localhost:5000";
+// axios.defaults.baseURL = "https://coral-app-xybu6.ondigitalocean.app";
 
 const baseURL =
 	window.location.hostname === "frontend.unknownclub.me"
