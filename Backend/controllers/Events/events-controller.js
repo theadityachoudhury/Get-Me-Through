@@ -172,7 +172,16 @@ const markAttendance = async (req, res, next) => {
     if (!eventId || !userId) {
         return res.status(404).json({ success: false, message: "Data incomplete", reason: "no-data" });
     }
-    const attendee = await applied.findOne({ user: userId, event: eventId });
+    const User = await user.findOne({ username: userId }).select('username');
+    if (!User) {
+        return res.status(404).json({
+            success: false,
+            message: "No user registered for this event!!",
+            reason: "no-user"
+        });
+    }
+    // console.log(U)
+    const attendee = await applied.findOne({ user: User._id, event: eventId });
     if (!attendee) {
         return res.status(404).json({
             success: false,
@@ -187,6 +196,43 @@ const markAttendance = async (req, res, next) => {
         success: true,
         message: "Attendance Successful"
     });
+}
+
+const getApplications = async (req, res, next) => {
+    const { eventId } = req.params;
+    try {
+        const applications = await applied.find({ event: eventId }, 'user attended').populate('user', 'username');
+        return res.status(200).json(applications);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            reason: "server",
+            message: "Unexpected Error Occurred!",
+            success: false,
+            data: err,
+        });
+    }
+
+}
+
+const mark = async (req, res, next) => {
+    console.log(req.body.users);
+    const { users } = req.body;
+    const { eventId } = req.params;
+
+    try {
+        for (const updatedAttendance of users) {
+            const attended = updatedAttendance.attended;
+            const user = updatedAttendance.user._id;
+            await applied.findOneAndUpdate(
+                { user: user, event: eventId },
+                { attended: attended }
+            );
+        }
+        res.status(200).json();
+    } catch (err) {
+        res.status(500).json();
+    }
 }
 
 const registeredUsers = async (req, res, next) => {
@@ -262,4 +308,6 @@ module.exports = {
     userRegisteredEvents,
     userAttendedEvents,
     registeredUsers,
+    getApplications,
+    mark,
 }
