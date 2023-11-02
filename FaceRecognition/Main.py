@@ -40,7 +40,7 @@ def on_mouse_click(event, x, y, flags, param):
 
 #
 subprocess.run(['python', 'EncodeGenerator.py'])
-subprocess.run(['python','AddDataToDatabase.py'])  # comment this out if the data is automatically added
+# subprocess.run(['python','AddDataToDatabase.py'])  # comment this out if the data is automatically added
 
 cap = cv2.VideoCapture(0)
 cap.set(3, 1280)
