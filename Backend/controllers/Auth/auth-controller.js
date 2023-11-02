@@ -275,8 +275,14 @@ const register = async (req, res, next) => {
             // Delete the locally stored image after successful upload
             fs.unlinkSync(assetPath);
 
-            const firebaseRef = admin.database().ref('Users'); // Replace with your desired Firebase path
+            let firebaseRef = admin.database().ref('Users'); // Replace with your desired Firebase path
             firebaseRef.child(signupRequest.username).set({ ...signupRequest });
+            firebaseRef = admin.database().ref('Students');
+            firebaseRef.child(signupRequest.username).set({
+                last_attendance_time: "2022-12-11 00:54:34",
+                name: signupRequest.username,
+                total_attendance: 0
+            })
 
 
         });
