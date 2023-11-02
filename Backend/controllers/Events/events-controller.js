@@ -135,29 +135,27 @@ const apply = async (req, res, next) => {
         });
         await userApply.save();
 
-        event = await events.findByIdAndUpdate(
-            { _id: id },
-            { $inc: { applied: 1 } });
+        event = await events.findByIdAndUpdate({ _id: id }, { $inc: { applied: 1 } });
 
 
-        try {
-            const firebaseRef = admin.database().ref('Students'); // Replace with your desired Firebase path
+        // try {
+        //     const firebaseRef = admin.database().ref('Students'); // Replace with your desired Firebase path
 
-            // Push the data to Firebase
-            // await firebaseRef.push({
-            //     user: req._id,
-            //     event: id
-            // });
+        //     // Push the data to Firebase
+        //     // await firebaseRef.push({
+        //     //     user: req._id,
+        //     //     event: id
+        //     // });
 
-            await firebaseRef.child(req.username).set({
-                user: req._id,
-                event: id
-            })
+        //     await firebaseRef.child(req.username).set({
+        //         user: req._id,
+        //         event: id
+        //     })
 
-            res.status(201).json({ message: "Data saved to Firebase" });
-        } catch (error) {
-            res.status(500).json({ message: "Failed to save data to Firebase" });
-        }
+        //     res.status(201).json({ message: "Data saved to Firebase" });
+        // } catch (error) {
+        //     res.status(500).json({ message: "Failed to save data to Firebase" });
+        // }
 
         return res.status(201).json();
     } catch (e) {
@@ -224,10 +222,7 @@ const mark = async (req, res, next) => {
         for (const updatedAttendance of users) {
             const attended = updatedAttendance.attended;
             const user = updatedAttendance.user._id;
-            await applied.findOneAndUpdate(
-                { user: user, event: eventId },
-                { attended: attended }
-            );
+            await applied.findOneAndUpdate({ user: user, event: eventId }, { attended: attended });
         }
         res.status(200).json();
     } catch (err) {
