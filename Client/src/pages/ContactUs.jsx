@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { UserContext } from "../UserContext";
+import ContactLogs from "./ContactLogs";
 
 const ContactUs = () => {
 	const { user, ready } = useContext(UserContext);
@@ -96,67 +97,71 @@ const ContactUs = () => {
 	};
 
 	if (user && ready)
-		return (
-			<div className="bg-white text-white mt-20 flex flex-col justify-center items-center">
-				<div className="bg-red-500 p-4 rounded-md">
-					<h1 className="text-3xl font-bold">Contact Us</h1>
+		if (user.role != "admin") {
+			return (
+				<div className="bg-white text-white mt-20 flex flex-col justify-center items-center">
+					<div className="bg-red-500 p-4 rounded-md">
+						<h1 className="text-3xl font-bold">Contact Us</h1>
+					</div>
+					<div className="bg-black text-white p-4 mt-4 rounded-md w-96 lg:w-1/2 xl:w-1/3">
+						<form className="space-y-4" onSubmit={handleSubmit}>
+							<div>
+								<label className="block text-lg">Username</label>
+								<input
+									type="text"
+									className="w-full border border-black rounded-md p-2"
+									name="username"
+									value={username}
+									onChange={handleChange}
+									disabled={user.username}
+								/>
+								<div className="text-red-600 text-sm">{formErrors.name}</div>
+							</div>
+							<div>
+								<label className="block text-lg">Name</label>
+								<input
+									type="text"
+									className="w-full border border-black rounded-md p-2"
+									name="name"
+									value={name}
+									onChange={handleChange}
+									disabled={user.name}
+								/>
+								<div className="text-red-600 text-sm">{formErrors.name}</div>
+							</div>
+							<div>
+								<label className="block text-lg">Email</label>
+								<input
+									type="email"
+									className="w-full border border-black rounded-md p-2"
+									name="email"
+									value={email}
+									onChange={handleChange}
+									disabled={user.email}
+								/>
+								<div className="text-red-600 text-sm">{formErrors.email}</div>
+							</div>
+							<div>
+								<label className="block text-lg">Message</label>
+								<textarea
+									className="w-full h-32 border border-black rounded-md p-2"
+									name="message"
+									value={message}
+									onChange={handleChange}></textarea>
+								<div className="text-red-600 text-sm">{formErrors.message}</div>
+							</div>
+							<button
+								className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+								type="submit">
+								Send Message
+							</button>
+						</form>
+					</div>
 				</div>
-				<div className="bg-black text-white p-4 mt-4 rounded-md w-96 lg:w-1/2 xl:w-1/3">
-                    <form className="space-y-4" onSubmit={handleSubmit}>
-                    <div>
-							<label className="block text-lg">Username</label>
-							<input
-								type="text"
-								className="w-full border border-black rounded-md p-2"
-								name="username"
-								value={username}
-								onChange={handleChange}
-								disabled={user.username}
-							/>
-							<div className="text-red-600 text-sm">{formErrors.name}</div>
-						</div>
-						<div>
-							<label className="block text-lg">Name</label>
-							<input
-								type="text"
-								className="w-full border border-black rounded-md p-2"
-								name="name"
-								value={name}
-								onChange={handleChange}
-								disabled={user.name}
-							/>
-							<div className="text-red-600 text-sm">{formErrors.name}</div>
-						</div>
-						<div>
-							<label className="block text-lg">Email</label>
-							<input
-								type="email"
-								className="w-full border border-black rounded-md p-2"
-								name="email"
-								value={email}
-								onChange={handleChange}
-								disabled={user.email}
-							/>
-							<div className="text-red-600 text-sm">{formErrors.email}</div>
-						</div>
-						<div>
-							<label className="block text-lg">Message</label>
-							<textarea
-								className="w-full h-32 border border-black rounded-md p-2"
-								name="message"
-								value={message}
-								onChange={handleChange}></textarea>
-							<div className="text-red-600 text-sm">{formErrors.message}</div>
-						</div>
-						<button
-							className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-							type="submit">
-							Send Message
-						</button>
-					</form>
-				</div>
-			</div>
-		);
+			);
+		} else {
+			return <ContactLogs />;
+		}
 };
 
 export default ContactUs;

@@ -11,6 +11,14 @@ const emailLogs = async (req, res, next) => {
     return res.status(200).json(emails);
 };
 
+const contactLogs = async (req, res, next) => {
+    const contacts = await Contact.find().sort({ createdAt: -1 });
+    if (!contacts) {
+        return res.status(200).json([]);
+    }
+    return res.status(200).json(contacts);
+};
+
 const contact = async (req, res, next) => {
     try {
         const contactRequest = await contactLogSchema.validateAsync(req.body);
@@ -36,5 +44,6 @@ const contact = async (req, res, next) => {
 
 module.exports = {
     emailLogs,
-    contact
+    contact,
+    contactLogs
 }
